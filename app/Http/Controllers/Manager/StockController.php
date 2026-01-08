@@ -61,6 +61,8 @@ class StockController extends Controller
         }
 
         // Existing product stock addition
+        $businessId = $this->getBusinessId();
+        
         $validated = $request->validate([
             'product_id' => ['required', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1'],

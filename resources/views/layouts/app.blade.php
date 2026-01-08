@@ -51,11 +51,32 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     @auth
-                        @if(auth()->user()->business)
-                            <span class="text-xl font-bold text-gray-800">{{ auth()->user()->business->name }}</span>
-                        @else
-                            <span class="text-xl font-bold text-gray-800">ইআরপি সিস্টেম</span>
-                        @endif
+                        @php
+                            $businessName = 'ইআরপি সিস্টেম';
+                            $dashboardRoute = '#';
+                            
+                            if (auth()->user()->isSuperAdmin()) {
+                                $dashboardRoute = route('superadmin.dashboard');
+                            } elseif (auth()->user()->isOwner()) {
+                                $dashboardRoute = route('owner.dashboard');
+                                $business = \App\Models\Business::where('owner_id', auth()->id())->first();
+                                if ($business) {
+                                    $businessName = $business->name;
+                                }
+                            } elseif (auth()->user()->isManager() || auth()->user()->isSalesman()) {
+                                $dashboardRoute = route('manager.dashboard');
+                                if (auth()->user()->business_id) {
+                                    $business = \App\Models\Business::find(auth()->user()->business_id);
+                                    if ($business) {
+                                        $businessName = $business->name;
+                                    }
+                                }
+                            }
+                        @endphp
+                        
+                        <a href="{{ $dashboardRoute }}" class="text-xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
+                            {{ $businessName }}
+                        </a>
                     @else
                         <span class="text-xl font-bold text-gray-800">ইআরপি সিস্টেম</span>
                     @endauth
