@@ -14,6 +14,9 @@ class StockEntry extends Model
         'quantity',
         'purchase_price',
         'added_by',
+        'business_id',
+        'supplier_name',
+        'supplier_phone',
     ];
 
     protected $casts = [

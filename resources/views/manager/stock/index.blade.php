@@ -26,42 +26,70 @@
         @php
             $routePrefix = auth()->user()->hasRole('owner') ? 'owner' : 'manager';
         @endphp
-        <form method="POST" action="{{ route($routePrefix . '.stock.store') }}" id="existingProductForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <form method="POST" action="{{ route($routePrefix . '.stock.store') }}" id="existingProductForm">
             @csrf
 
-            <div>
-                <label for="product_id" class="block text-gray-700 text-sm font-bold mb-2">পণ্য নির্বাচন করুন</label>
-                <select name="product_id" id="product_id" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('product_id') border-red-500 @enderror" required>
-                    <option value="">পণ্য নির্বাচন করুন</option>
-                    @foreach($products as $product)
-                        <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }} (পণ্য কোড: {{ $product->sku }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('product_id')
-                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label for="product_id" class="block text-gray-700 text-sm font-bold mb-2">পণ্য নির্বাচন করুন *</label>
+                    <select name="product_id" id="product_id" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('product_id') border-red-500 @enderror" required>
+                        <option value="">পণ্য নির্বাচন করুন</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                {{ $product->name }} (পণ্য কোড: {{ $product->sku }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('product_id')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">পরিমাণ *</label>
+                    <input type="number" name="quantity" id="quantity" value="{{ old('quantity') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('quantity') border-red-500 @enderror" required>
+                    @error('quantity')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="purchase_price" class="block text-gray-700 text-sm font-bold mb-2">ক্রয়মূল্য (৳) *</label>
+                    <input type="number" step="0.01" name="purchase_price" id="purchase_price" value="{{ old('purchase_price') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('purchase_price') border-red-500 @enderror" required>
+                    @error('purchase_price')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="sell_price" class="block text-gray-700 text-sm font-bold mb-2">বিক্রয়মূল্য (৳) *</label>
+                    <input type="number" step="0.01" name="sell_price" id="sell_price" value="{{ old('sell_price') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('sell_price') border-red-500 @enderror" required>
+                    @error('sell_price')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div>
-                <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">পরিমাণ</label>
-                <input type="number" name="quantity" id="quantity" value="{{ old('quantity') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('quantity') border-red-500 @enderror" required>
-                @error('quantity')
-                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="supplier_name" class="block text-gray-700 text-sm font-bold mb-2">সরবরাহকারীর নাম (ঐচ্ছিক)</label>
+                    <input type="text" name="supplier_name" id="supplier_name" value="{{ old('supplier_name') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('supplier_name') border-red-500 @enderror" placeholder="সরবরাহকারীর নাম">
+                    @error('supplier_name')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="supplier_phone" class="block text-gray-700 text-sm font-bold mb-2">সরবরাহকারীর ফোন (ঐচ্ছিক)</label>
+                    <input type="text" name="supplier_phone" id="supplier_phone" value="{{ old('supplier_phone') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('supplier_phone') border-red-500 @enderror" placeholder="01XXXXXXXXX">
+                    @error('supplier_phone')
+                        <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <div>
-                <label for="purchase_price" class="block text-gray-700 text-sm font-bold mb-2">ক্রয়মূল্য (৳)</label>
-                <input type="number" step="0.01" name="purchase_price" id="purchase_price" value="{{ old('purchase_price') }}" class="shadow border rounded w-full py-2 px-3 text-gray-700 @error('purchase_price') border-red-500 @enderror" required>
-                @error('purchase_price')
-                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="flex items-end">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
                     স্টক যোগ করুন
                 </button>
             </div>

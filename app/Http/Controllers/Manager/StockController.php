@@ -65,14 +65,33 @@ class StockController extends Controller
             'product_id' => ['required', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
+            'sell_price' => ['nullable', 'numeric', 'min:0'],
+            'supplier_name' => ['nullable', 'string', 'max:255'],
+            'supplier_phone' => ['nullable', 'string', 'max:15'],
         ]);
 
         $product = Product::findOrFail($validated['product_id']);
-        $product->addStock(
-            $validated['quantity'],
-            $validated['purchase_price'],
-            auth()->id()
-        );
+        
+        // Create stock entry with supplier information
+        StockEntry::create([
+            'product_id' => $product->id,
+            'quantity' => $validated['quantity'],
+            'purchase_price' => $validated['purchase_price'],
+            'added_by' => auth()->id(),
+            'business_id' => $businessId,
+            'supplier_name' => $validated['supplier_name'] ?? null,
+            'supplier_phone' => $validated['supplier_phone'] ?? null,
+        ]);
+        
+        // Update product stock and prices
+        $product->current_stock += $validated['quantity'];
+        $product->purchase_price = $validated['purchase_price'];
+        
+        if (isset($validated['sell_price'])) {
+            $product->sell_price = $validated['sell_price'];
+        }
+        
+        $product->save();
 
         $routePrefix = auth()->user()->hasRole('owner') ? 'owner' : 'manager';
         return redirect()->route($routePrefix . '.stock.index')->with('success', 'স্টক সফলভাবে যোগ করা হয়েছে।');
