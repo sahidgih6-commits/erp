@@ -59,9 +59,11 @@
                                 $dashboardRoute = route('superadmin.dashboard');
                             } elseif (auth()->user()->isOwner()) {
                                 $dashboardRoute = route('owner.dashboard');
-                                $business = \App\Models\Business::where('owner_id', auth()->id())->first();
-                                if ($business) {
-                                    $businessName = $business->name;
+                                if (auth()->user()->business_id) {
+                                    $business = \App\Models\Business::find(auth()->user()->business_id);
+                                    if ($business) {
+                                        $businessName = $business->name;
+                                    }
                                 }
                             } elseif (auth()->user()->isManager() || auth()->user()->isSalesman()) {
                                 $dashboardRoute = route('manager.dashboard');
