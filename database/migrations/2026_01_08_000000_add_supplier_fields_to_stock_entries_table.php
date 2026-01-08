@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stock_entries', function (Blueprint $table) {
+            $table->foreignId('business_id')->nullable()->after('added_by')->constrained()->onDelete('cascade');
             $table->string('supplier_name')->nullable()->after('purchase_price');
             $table->string('supplier_phone', 15)->nullable()->after('supplier_name');
         });
@@ -23,7 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('stock_entries', function (Blueprint $table) {
-            $table->dropColumn(['supplier_name', 'supplier_phone']);
+            $table->dropForeign(['business_id']);
+            $table->dropColumn(['business_id', 'supplier_name', 'supplier_phone']);
         });
     }
 };
