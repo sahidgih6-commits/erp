@@ -243,7 +243,25 @@ class OwnerController extends Controller
             $query->where('voucher_number', 'LIKE', '%' . request('voucher_search') . '%');
         }
         
-        $sales = $query->orderBy('created_at', 'desc')->paginate(50)->withQueryString();
+        $rawSales = $query->orderBy('created_at', 'desc')->get();
+        // Group by voucher number
+        $groupedSales = $rawSales->groupBy('voucher_number')->map(function($group) {
+            $first = $group->first();
+            return [
+                'voucher_number' => $first->voucher_number,
+                'created_at' => $first->created_at,
+                'customer_name' => $first->customer_name,
+                'customer_phone' => $first->customer_phone,
+                'salesman' => $first->user->name,
+                'products' => $group->map(function($sale) { return $sale->product->name; })->implode(', '),
+                'quantity' => $group->sum('quantity'),
+                'total_amount' => $group->sum('total_amount'),
+                'paid_amount' => $group->sum('paid_amount'),
+                'due_amount' => $group->sum('due_amount'),
+                'profit' => $group->sum('profit'),
+                'ids' => $group->pluck('id'),
+            ];
+        })->values();
         
         // Calculate totals based on filtered results
         $statsQuery = Sale::whereIn('user_id', $businessUserIds);

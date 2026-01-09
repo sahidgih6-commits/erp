@@ -81,48 +81,48 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($sales as $sale)
+                    @forelse($groupedSales as $group)
                     <tr class="hover:bg-gray-50">
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                            {{ $sale->created_at->format('d/m/Y') }}
+                            {{ $group['created_at']->format('d/m/Y') }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
-                            <a href="{{ route('voucher.print', $sale->id) }}" target="_blank" 
+                            <a href="{{ route('voucher.print', $group['ids'][0]) }}" target="_blank" 
                                class="font-mono text-blue-600 hover:text-blue-800 hover:underline font-semibold">
-                                🧾 {{ $sale->voucher_number ?? 'N/A' }}
+                                🧾 {{ $group['voucher_number'] ?? 'N/A' }}
                             </a>
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
-                            {{ $sale->product->name }}
+                            {{ $group['products'] }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
-                            {{ $sale->customer_name ?? '-' }}
+                            {{ $group['customer_name'] ?? '-' }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-600 hidden sm:table-cell">
-                            {{ $sale->customer_phone ?? '-' }}
+                            {{ $group['customer_phone'] ?? '-' }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                            {{ $sale->quantity }}
+                            {{ $group['quantity'] }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-semibold text-gray-900">
-                            ৳{{ number_format($sale->total_amount, 2) }}
+                            ৳{{ number_format($group['total_amount'], 2) }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-green-600 font-semibold hidden md:table-cell">
-                            ৳{{ number_format($sale->paid_amount, 2) }}
+                            ৳{{ number_format($group['paid_amount'], 2) }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-bold hidden md:table-cell">
-                            <span class="{{ $sale->due_amount > 0 ? 'text-red-600' : 'text-green-600' }}">
-                                ৳{{ number_format($sale->due_amount, 2) }}
+                            <span class="{{ $group['due_amount'] > 0 ? 'text-red-600' : 'text-green-600' }}">
+                                ৳{{ number_format($group['due_amount'], 2) }}
                             </span>
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-blue-600 font-semibold hidden lg:table-cell">
-                            ৳{{ number_format($sale->profit, 2) }}
+                            ৳{{ number_format($group['profit'], 2) }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                            {{ $sale->user->name }}
+                            {{ $group['salesman'] }}
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
-                            <button onclick="confirmDelete({{ $sale->id }}, '{{ $sale->voucher_number }}')" 
+                            <button onclick="confirmDelete({{ $group['ids'][0] }}, '{{ $group['voucher_number'] }}')" 
                                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs sm:text-sm">
                                 ↶ বাতিল
                             </button>
