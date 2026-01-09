@@ -2,29 +2,53 @@
 
 @section('title', 'নতুন বিক্রয়')
 
-@push('styles')
+@section('content')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <style>
     .select2-container--default .select2-selection--single {
         height: 42px !important;
         border: 1px solid #d1d5db !important;
         border-radius: 0.375rem !important;
-        padding: 0.5rem 0.75rem !important;
     }
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 26px !important;
-        padding-left: 0 !important;
+        line-height: 42px !important;
+        padding-left: 12px !important;
+        font-size: 14px !important;
     }
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 40px !important;
+        right: 8px !important;
     }
     .select2-container {
         width: 100% !important;
+        font-size: 14px !important;
+    }
+    .select2-dropdown {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.375rem !important;
+    }
+    .select2-search--dropdown .select2-search__field {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.375rem !important;
+        padding: 8px !important;
+    }
+    .select2-results__option {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+    @media (max-width: 640px) {
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            font-size: 12px !important;
+        }
+        .select2-results__option {
+            font-size: 12px !important;
+        }
     }
 </style>
-@endpush
 
-@section('content')
 <div class="min-h-screen w-full px-2 sm:px-4 lg:px-6">
     <div class="mb-4 sm:mb-6">
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">নতুন বিক্রয় তৈরি করুন</h1>
@@ -38,15 +62,15 @@
             @csrf
 
             <div class="mb-4 sm:mb-6">
-                <label for="product_id" class="block text-gray-700 text-xs sm:text-sm font-bold mb-2">পণ্য *</label>
-                <select name="product_id" id="product_id" class="shadow border rounded w-full py-2 px-3 text-sm sm:text-base text-gray-700 @error('product_id') border-red-500 @enderror" required>
-                    <option value="">পণ্য নির্বাচন করুন</option>
+                <label for="product_id" class="block text-gray-700 text-xs sm:text-sm font-bold mb-2">পণ্য খুঁজুন এবং নির্বাচন করুন *</label>
+                <select name="product_id" id="product_id" class="w-full" required>
+                    <option value="">পণ্য খুঁজুন...</option>
                     @foreach($products as $product)
                         <option value="{{ $product->id }}" 
                                 data-price="{{ $product->sell_price }}" 
                                 data-stock="{{ $product->current_stock }}"
                                 {{ old('product_id') == $product->id ? 'selected' : '' }}>
-                            {{ $product->name }} (পণ্য কোড: {{ $product->sku }}) - স্টক: {{ $product->current_stock }}
+                            {{ $product->name }} (কোড: {{ $product->sku }}) - স্টক: {{ $product->current_stock }}
                         </option>
                     @endforeach
                 </select>
@@ -290,18 +314,40 @@ function updateDue() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Select2 for product dropdown
+$(document).ready(function() {
+    // Initialize Select2 for product dropdown with search
     $('#product_id').select2({
-        placeholder: 'পণ্য খুঁজুন...',
+        placeholder: 'পণ্য খুঁজুন (বাংলা/English)',
         allowClear: true,
+        width: '100%',
         language: {
             noResults: function() {
                 return 'কোন পণ্য পাওয়া যায়নি';
             },
             searching: function() {
                 return 'খুঁজছি...';
+            },
+            inputTooShort: function() {
+                return 'আরো লিখুন...';
             }
+        },
+        matcher: function(params, data) {
+            // If there are no search terms, return all data
+            if ($.trim(params.term) === '') {
+                return data;
+            }
+
+            // Search in both Bengali and English
+            var term = params.term.toLowerCase();
+            var text = data.text.toLowerCase();
+            
+            // Match if the term is found anywhere in the text
+            if (text.indexOf(term) > -1) {
+                return data;
+            }
+
+            // Return null if the term should not be displayed
+            return null;
         }
     }).on('change', function() {
         updateTotal();
@@ -318,7 +364,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 @endsection
