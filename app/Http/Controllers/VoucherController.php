@@ -13,13 +13,18 @@ class VoucherController extends Controller
     {
         $sale = Sale::with(['product', 'user.business'])->findOrFail($saleId);
         
+        // Get all sales with the same voucher number (for multiple product sales)
+        $allSales = Sale::with(['product'])
+            ->where('voucher_number', $sale->voucher_number)
+            ->get();
+        
         // Get business from the sale user
         $business = $sale->user->business;
         
         // Get voucher template for the business
         $template = $business ? $business->voucherTemplate : null;
         
-        return view('voucher.print', compact('sale', 'template'));
+        return view('voucher.print', compact('sale', 'allSales', 'template'));
     }
 
     public function paymentVoucher($profitRealizationId)

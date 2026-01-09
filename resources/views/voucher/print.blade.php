@@ -400,13 +400,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>{{ $sale->product->name }}</strong></td>
-                        <td>{{ $sale->product->sku }}</td>
-                        <td style="text-align: center;"><strong>{{ $sale->quantity }}</strong></td>
-                        <td style="text-align: right;">৳{{ number_format($sale->sell_price, 2) }}</td>
-                        <td style="text-align: right;"><strong>৳{{ number_format($sale->total_amount, 2) }}</strong></td>
-                    </tr>
+                    @php
+                        $grandTotal = 0;
+                        $grandPaid = 0;
+                        $grandDue = 0;
+                    @endphp
+                    @foreach($allSales as $saleItem)
+                        @php
+                            $grandTotal += $saleItem->total_amount;
+                            $grandPaid += $saleItem->paid_amount;
+                            $grandDue += $saleItem->due_amount;
+                        @endphp
+                        <tr>
+                            <td><strong>{{ $saleItem->product->name }}</strong></td>
+                            <td>{{ $saleItem->product->sku }}</td>
+                            <td style="text-align: center;"><strong>{{ $saleItem->quantity }}</strong></td>
+                            <td style="text-align: right;">৳{{ number_format($saleItem->sell_price, 2) }}</td>
+                            <td style="text-align: right;"><strong>৳{{ number_format($saleItem->total_amount, 2) }}</strong></td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -415,16 +427,16 @@
         <div class="total-section">
             <div class="total-row">
                 <span><strong>মোট টাকা / Total Amount:</strong></span>
-                <span><strong>৳{{ number_format($sale->total_amount, 2) }}</strong></span>
+                <span><strong>৳{{ number_format($grandTotal, 2) }}</strong></span>
             </div>
             <div class="total-row">
                 <span>পরিশোধিত / Paid:</span>
-                <span>৳{{ number_format($sale->paid_amount, 2) }}</span>
+                <span>৳{{ number_format($grandPaid, 2) }}</span>
             </div>
-            @if($sale->due_amount > 0)
+            @if($grandDue > 0)
             <div class="total-row grand due">
                 <span>বকেয়া / Due Amount:</span>
-                <span>৳{{ number_format($sale->due_amount, 2) }}</span>
+                <span>৳{{ number_format($grandDue, 2) }}</span>
             </div>
             @else
             <div class="total-row grand">
