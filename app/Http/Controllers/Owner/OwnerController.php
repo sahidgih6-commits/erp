@@ -193,13 +193,30 @@ class OwnerController extends Controller
         $profitRealization = ProfitRealization::with(['sale.product', 'sale.user'])->findOrFail($profitRealizationId);
         $sale = $profitRealization->sale;
         
-        // Get owner
-        $salesman = $sale->user;
-        $manager = $salesman && $salesman->hasRole('manager') ? $salesman : ($salesman->creator ?? null);
-        $owner = $manager && $manager->hasRole('owner') ? $manager : ($manager->creator ?? null);
+        // Get owner - traverse the user hierarchy
+        $currentUser = $sale->user;
+        $owner = null;
+        
+        // Try to find owner by traversing up the hierarchy
+        while ($currentUser) {
+            if ($currentUser->hasRole('owner')) {
+                $owner = $currentUser;
+                break;
+            }
+            $currentUser = $currentUser->creator;
+        }
+        
+        // If no owner found, use the authenticated user's business owner
+        if (!$owner) {
+            $owner = User::where('business_id', $sale->user->business_id)
+                        ->whereHas('roles', function($q) {
+                            $q->where('name', 'owner');
+                        })
+                        ->first();
+        }
         
         // Get voucher template
-        $template = \App\Models\VoucherTemplate::where('owner_id', $owner->id)->first();
+        $template = $owner ? \App\Models\VoucherTemplate::where('owner_id', $owner->id)->first() : null;
         
         return view('voucher.payment-voucher', compact('profitRealization', 'sale', 'template'));
     }
