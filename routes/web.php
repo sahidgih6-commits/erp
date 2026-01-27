@@ -140,10 +140,11 @@ Route::middleware(['auth', 'role:salesman'])->prefix('salesman')->name('salesman
 // Language/Locale Route
 Route::get('/locale/{lang}', function ($lang) {
     if (in_array($lang, ['en', 'bn'])) {
-        session(['locale' => $lang]);
+        session()->put('locale', $lang);
+        session()->save(); // Force save
         app()->setLocale($lang);
     }
-    return redirect()->back();
+    return redirect()->back()->with('locale_changed', true);
 })->name('locale');
 
 // POS Routes
