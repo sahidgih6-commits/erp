@@ -138,6 +138,8 @@ class POSDashboardController extends Controller
             'payment_method' => 'required|in:cash,card,mobile',
             'amount_tendered' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
+            'customer_name' => 'nullable|string|max:255',
+            'customer_phone' => 'nullable|string|max:20',
         ]);
 
         $user = Auth::user();
@@ -162,10 +164,35 @@ class POSDashboardController extends Controller
                 'completed_at' => now(),
             ]);
 
-            // Reduce stock for each item
+            // Get customer info from request or use default
+            $customerName = $request->customer_name ?? 'POS Customer';
+            $customerPhone = $request->customer_phone ?? null;
+
+            // Create Sale records for each item and reduce stock
             foreach ($request->items as $item) {
                 $product = Product::find($item['product_id']);
                 if ($product) {
+                    // Calculate profit for this item
+                    $profit = ($item['price'] - $product->purchase_price) * $item['quantity'];
+                    $itemTotal = $item['price'] * $item['quantity'];
+
+                    // Create Sale record linked to POS transaction
+                    Sale::create([
+                        'user_id' => $user->id,
+                        'product_id' => $product->id,
+                        'quantity' => $item['quantity'],
+                        'sell_price' => $item['price'],
+                        'total_amount' => $itemTotal,
+                        'paid_amount' => $itemTotal, // POS sales are fully paid
+                        'due_amount' => 0,
+                        'profit' => $profit,
+                        'payment_status' => 'paid',
+                        'customer_name' => $customerName,
+                        'customer_phone' => $customerPhone,
+                        'voucher_number' => $transaction->transaction_number, // Link to POS transaction
+                    ]);
+
+                    // Reduce stock
                     $product->decrement('current_stock', $item['quantity']);
                 }
             }

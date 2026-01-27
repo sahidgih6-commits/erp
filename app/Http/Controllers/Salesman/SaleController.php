@@ -202,6 +202,19 @@ class SaleController extends Controller
             // Delete all profit realizations for this sale
             ProfitRealization::where('sale_id', $sale->id)->delete();
 
+            // If this sale is linked to a POS transaction, check if we should delete it
+            // Delete POS transaction only if ALL items from that transaction are being deleted
+            if ($sale->voucher_number && str_starts_with($sale->voucher_number, 'TRX-')) {
+                $remainingSales = Sale::where('voucher_number', $sale->voucher_number)
+                    ->where('id', '!=', $sale->id)
+                    ->count();
+                
+                // If this is the last sale from this POS transaction, delete the transaction
+                if ($remainingSales == 0) {
+                    \App\Models\POSTransaction::where('transaction_number', $sale->voucher_number)->delete();
+                }
+            }
+
             // Delete the sale
             $sale->delete();
 

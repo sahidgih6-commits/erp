@@ -8,9 +8,38 @@
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ __('dashboard.owner_dashboard') }}</h1>
     </div>
 
+    <!-- Date Filter -->
+    <div class="bg-white rounded-lg shadow p-4 mb-4">
+        <form method="GET" action="{{ route('owner.dashboard') }}" class="flex flex-wrap gap-3 items-end">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('sales.start_date') }}</label>
+                <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('sales.end_date') }}</label>
+                <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                {{ __('sales.search') }}
+            </button>
+            <a href="{{ route('owner.dashboard', ['start_date' => now()->format('Y-m-d'), 'end_date' => now()->format('Y-m-d')]) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                {{ __('dashboard.today') ?? 'Today' }}
+            </a>
+            <a href="{{ route('owner.dashboard', ['start_date' => now()->startOfMonth()->format('Y-m-d'), 'end_date' => now()->endOfMonth()->format('Y-m-d')]) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                {{ __('dashboard.this_month') ?? 'This Month' }}
+            </a>
+        </form>
+    </div>
+
     <!-- Today's Summary -->
     <div class="mb-3 sm:mb-4">
-        <h2 class="text-lg sm:text-xl font-semibold text-gray-700 mb-2 sm:mb-3">{{ __('dashboard.todays_summary') }}</h2>
+        <h2 class="text-lg sm:text-xl font-semibold text-gray-700 mb-2 sm:mb-3">
+            @if($startDate->eq($endDate))
+                {{ $startDate->format('d/m/Y') }} {{ __('dashboard.summary') ?? '' }}
+            @else
+                {{ $startDate->format('d/m/Y') }} - {{ $endDate->format('d/m/Y') }}
+            @endif
+        </h2>
     </div>
     @if(auth()->user()->isDueSystemEnabled())
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6 lg:mb-8">

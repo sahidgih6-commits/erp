@@ -101,6 +101,19 @@
 
         <!-- Payment Section -->
         <div class="p-4 border-t border-gray-200 space-y-3">
+            <!-- Customer Info (Optional) -->
+            <div class="bg-blue-50 p-3 rounded-lg space-y-2">
+                <label class="block text-xs font-semibold text-gray-700">{{ __('sales.customer') }} ({{ __('messages.optional') ?? 'Optional' }})</label>
+                <input type="text" 
+                       id="customerName" 
+                       placeholder="{{ __('sales.customer') }}"
+                       class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded">
+                <input type="text" 
+                       id="customerPhone" 
+                       placeholder="{{ __('sales.phone') }}"
+                       class="w-full px-2 py-1.5 text-sm border border-gray-300 rounded">
+            </div>
+
             <!-- Payment Method -->
             <div>
                 <label class="block text-sm font-semibold mb-2">{{ __('pos.payment_method') }}</label>
@@ -309,7 +322,9 @@
             total: total,
             payment_method: document.getElementById('paymentMethod').value,
             amount_tendered: tendered,
-            notes: 'POS Transaction'
+            notes: 'POS Transaction',
+            customer_name: document.getElementById('customerName').value || null,
+            customer_phone: document.getElementById('customerPhone').value || null
         };
         
         fetch('{{ route("pos.transaction.store") }}', {
@@ -353,6 +368,8 @@
         cart = [];
         document.getElementById('amountTendered').value = '';
         document.getElementById('paymentMethod').value = 'cash';
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerPhone').value = '';
         updateCart();
         
         // Fetch and update summary

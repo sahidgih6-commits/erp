@@ -24,21 +24,25 @@ class OwnerController extends Controller
         $totalManagers = User::role('manager')->where('business_id', $businessId)->count();
         $totalSalesmen = User::role('salesman')->where('business_id', $businessId)->count();
         
-        // Today's data - filtered by business users
+        // Get date range from request or default to today
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : Carbon::today();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : Carbon::today();
+        
+        // Selected period data - filtered by business users and date range
         $todaySales = Sale::whereIn('user_id', $businessUserIds)
-            ->whereDate('created_at', Carbon::today())
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->sum('total_amount');
         $todayProfit = Sale::whereIn('user_id', $businessUserIds)
-            ->whereDate('created_at', Carbon::today())
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->sum('profit');
         $todayPaid = Sale::whereIn('user_id', $businessUserIds)
-            ->whereDate('created_at', Carbon::today())
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->sum('paid_amount');
         $todayDue = Sale::whereIn('user_id', $businessUserIds)
-            ->whereDate('created_at', Carbon::today())
+            ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->sum('due_amount');
         $todayExpenses = Expense::whereIn('user_id', $businessUserIds)
-            ->whereDate('expense_date', Carbon::today())
+            ->whereBetween('expense_date', [$startDate->startOfDay(), $endDate->endOfDay()])
             ->sum('amount');
         
         // This month's data - filtered by business users
@@ -107,7 +111,9 @@ class OwnerController extends Controller
             'totalStockValue',
             'totalDue',
             'dueCustomers',
-            'recentSales'
+            'recentSales',
+            'startDate',
+            'endDate'
         ));
     }
     
