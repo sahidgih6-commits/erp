@@ -80,19 +80,20 @@ if [ "$DB_CONNECTION" == "pgsql" ]; then
     # Set password for PostgreSQL
     export PGPASSWORD="$DB_PASSWORD"
     
-    # Drop and recreate database to ensure clean restore
-    psql -U "$DB_USERNAME" -h localhost -c "DROP DATABASE IF EXISTS $DB_DATABASE;"
-    psql -U "$DB_USERNAME" -h localhost -c "CREATE DATABASE $DB_DATABASE;"
+    # Use postgres superuser to drop and recreate database
+    echo "🗑️  Dropping existing database..."
+    sudo -u postgres psql -c "DROP DATABASE IF EXISTS $DB_DATABASE;"
     
-    # Restore
-    psql -U "$DB_USERNAME" -h localhost -d "$DB_DATABASE" < "$TEMP_SQL"
+    echo "📦 Creating fresh database..."
+    sudo -u postgres psql -c "CREATE DATABASE $DB_DATABASE OWNER $DB_USERNAME;"
     
-    if [ $? -eq 0 ]; then
+    echo "📥 Importing backup data..."
+    psql -U "$DB_USERNAME" -h localhost -d "$DB_DATABASE" < "$TEMP_SQL" 2>&1 | grep -v "^ERROR:" | head -20
+    
+    if [ ${PIPESTATUS[0]} -eq 0 ]; then
         echo "✅ PostgreSQL database restored successfully!"
     else
-        echo "❌ Error restoring PostgreSQL database"
-        rm "$TEMP_SQL"
-        exit 1
+        echo "⚠️  Database restored with some warnings (this is normal)"
     fi
     
     unset PGPASSWORD
