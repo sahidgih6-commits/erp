@@ -221,14 +221,14 @@
                 </a>
                 @if(auth()->user()->isDueSystemEnabled())
                 <a href="{{ route('owner.due-customers') }}" class="block bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    বকেয়া গ্রাহক দেখুন
+                    {{ __('dashboard.view_due_customers') }}
                 </a>
                 @endif
                 <a href="{{ route('owner.all-sales') }}" class="block bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    সকল বিক্রয় দেখুন
+                    {{ __('dashboard.view_all_sales') }}
                 </a>
                 <a href="{{ route('owner.reports') }}" class="block bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    রিপোর্ট দেখুন
+                    {{ __('dashboard.view_reports') }}
                 </a>
                 
                 @php
@@ -238,10 +238,10 @@
                 
                 @if($posEnabled)
                 <a href="{{ route('owner.barcode.index') }}" class="block bg-teal-500 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    🏷️ বারকোড প্রিন্ট করুন
+                    🏷️ {{ __('dashboard.print_barcode') }}
                 </a>
                 <a href="{{ route('pos.dashboard') }}" class="block bg-cyan-500 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    💳 POS সিস্টেম
+                    💳 {{ __('dashboard.pos_system') }}
                 </a>
                 @endif
             </div>

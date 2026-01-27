@@ -65,4 +65,9 @@ return [
     'manager_management' => 'Manager Management',
     'product_management' => 'Product Management',
     'stock_management' => 'Stock Management',
+    'view_due_customers' => 'View Due Customers',
+    'view_all_sales' => 'View All Sales',
+    'view_reports' => 'View Reports',
+    'print_barcode' => 'Print Barcode',
+    'pos_system' => 'POS System',
 ];

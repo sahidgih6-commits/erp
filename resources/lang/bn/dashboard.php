@@ -63,4 +63,10 @@ return [
     'create_new_sale' => 'নতুন বিক্রয় তৈরি করুন',
     'manager_management' => 'ম্যানেজার পরিচালনা',
     'product_management' => 'পণ্য পরিচালনা',
-    'stock_management' => 'স্টক পরিচালনা',];
+    'stock_management' => 'স্টক পরিচালনা',
+    'view_due_customers' => 'বকেয়া গ্রাহক দেখুন',
+    'view_all_sales' => 'সকল বিক্রয় দেখুন',
+    'view_reports' => 'রিপোর্ট দেখুন',
+    'print_barcode' => 'বারকোড প্রিন্ট করুন',
+    'pos_system' => 'POS সিস্টেম',
+];
