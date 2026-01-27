@@ -5,6 +5,8 @@ use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\OwnerController as SuperAdminOwnerController;
 use App\Http\Controllers\Owner\OwnerController;
 use App\Http\Controllers\Owner\ManagerController as OwnerManagerController;
+use App\Http\Controllers\Owner\UserController as OwnerUserController;
+use App\Http\Controllers\Owner\BarcodeController as OwnerBarcodeController;
 use App\Http\Controllers\Owner\ExpenseController;
 use App\Http\Controllers\Manager\ManagerController;
 use App\Http\Controllers\Manager\SalesmanController as ManagerSalesmanController;
@@ -69,7 +71,23 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/payment/{sale}/record', [OwnerController::class, 'recordPayment'])->name('payment.record');
     Route::post('/payment/{sale}/store', [OwnerController::class, 'storePayment'])->name('payment.store');
     Route::get('/payment-voucher/{profitRealization}', [OwnerController::class, 'paymentVoucher'])->name('payment.voucher');
+    
+    // User Management (Managers, Salesmen, Cashiers)
+    Route::resource('users', OwnerUserController::class);
+    
+    // Barcode Printing (POS Feature)
+    Route::get('/barcode', [OwnerBarcodeController::class, 'index'])->name('barcode.index');
+    Route::post('/barcode/generate', [OwnerBarcodeController::class, 'generate'])->name('barcode.generate');
+    Route::get('/barcode/quick-print/{product}', [OwnerBarcodeController::class, 'quickPrint'])->name('barcode.quick-print');
+    
+    // Categories & Customers (same as manager)
+    Route::get('/customers/search', [\App\Http\Controllers\Manager\CustomerController::class, 'search'])->name('customers.search');
+    Route::resource('categories', \App\Http\Controllers\Manager\CategoryController::class);
+    Route::resource('customers', \App\Http\Controllers\Manager\CustomerController::class);
+    
+    // Legacy manager routes (redirects to users)
     Route::resource('managers', OwnerManagerController::class);
+    
     Route::resource('expenses', ExpenseController::class);
     Route::resource('products', ManagerProductController::class);
     Route::get('/stock', [ManagerStockController::class, 'index'])->name('stock.index');
@@ -91,6 +109,9 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
     Route::get('/payment-voucher/{profitRealization}', [ManagerController::class, 'paymentVoucher'])->name('payment.voucher');
     Route::resource('salesmen', ManagerSalesmanController::class);
     Route::resource('products', ManagerProductController::class);
+    Route::get('/customers/search', [\App\Http\Controllers\Manager\CustomerController::class, 'search'])->name('customers.search');
+    Route::resource('categories', \App\Http\Controllers\Manager\CategoryController::class);
+    Route::resource('customers', \App\Http\Controllers\Manager\CustomerController::class);
     Route::get('/stock', [ManagerStockController::class, 'index'])->name('stock.index');
     Route::post('/stock', [ManagerStockController::class, 'store'])->name('stock.store');
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
@@ -98,7 +119,14 @@ Route::middleware(['auth', 'role:manager'])->prefix('manager')->name('manager.')
     Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
     Route::get('/due-payments', [DuePaymentController::class, 'index'])->name('due-payments.index');
     Route::post('/due-payments/{sale}', [DuePaymentController::class, 'update'])->name('due-payments.update');
-    Route::get('/reports', [ReportController::class, 'managerReports'])->name('reports');
+    
+    // Reports
+    Route::get('/reports', [\App\Http\Controllers\Manager\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/sales', [\App\Http\Controllers\Manager\ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/stock', [\App\Http\Controllers\Manager\ReportController::class, 'stock'])->name('reports.stock');
+    Route::get('/reports/profit', [\App\Http\Controllers\Manager\ReportController::class, 'profit'])->name('reports.profit');
+    Route::get('/reports/customers', [\App\Http\Controllers\Manager\ReportController::class, 'customers'])->name('reports.customers');
+    Route::get('/reports/export', [\App\Http\Controllers\Manager\ReportController::class, 'export'])->name('reports.export');
 });
 
 // Salesman Routes
@@ -107,4 +135,59 @@ Route::middleware(['auth', 'role:salesman'])->prefix('salesman')->name('salesman
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
     Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
     Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+});
+
+// Language/Locale Route
+Route::get('/locale/{lang}', function ($lang) {
+    if (in_array($lang, ['en', 'bn'])) {
+        session(['locale' => $lang]);
+        app()->setLocale($lang);
+    }
+    return redirect()->back();
+})->name('locale');
+
+// POS Routes
+Route::middleware(['auth', 'role:owner|manager|salesman|cashier'])->prefix('pos')->name('pos.')->group(function () {
+    // Original POS routes
+    Route::get('/dashboard', [\App\Http\Controllers\POS\POSDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/billing', [\App\Http\Controllers\POS\POSDashboardController::class, 'billing'])->name('billing');
+    Route::post('/transaction', [\App\Http\Controllers\POS\POSDashboardController::class, 'createTransaction'])->name('transaction.store');
+    Route::post('/print-receipt/{transaction}', [\App\Http\Controllers\POS\POSDashboardController::class, 'printReceipt'])->name('receipt.print');
+    Route::post('/open-drawer', [\App\Http\Controllers\POS\POSDashboardController::class, 'openDrawer'])->name('drawer.open');
+    Route::get('/search-product', [\App\Http\Controllers\POS\POSDashboardController::class, 'searchProduct'])->name('product.search');
+    Route::get('/summary', [\App\Http\Controllers\POS\POSDashboardController::class, 'getSummary'])->name('summary');
+    Route::get('/history', [\App\Http\Controllers\POS\POSDashboardController::class, 'history'])->name('history');
+    
+    // Enhanced POS routes
+    Route::get('/enhanced-billing', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'billing'])->name('enhanced-billing');
+    Route::get('/search-products', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'searchProducts'])->name('products.search');
+    Route::post('/enhanced-billing', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'checkout'])->name('enhanced-billing.store');
+    Route::post('/checkout', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'checkout'])->name('checkout');
+    Route::post('/hold', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'hold'])->name('hold');
+    Route::get('/recall/{id}', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'recall'])->name('recall');
+    Route::delete('/hold/{id}', [\App\Http\Controllers\POS\EnhancedPOSController::class, 'cancelHold'])->name('hold.cancel');
+    
+    // Cash Drawer Management
+    Route::get('/cash-drawer', [\App\Http\Controllers\POS\CashDrawerController::class, 'index'])->name('cash-drawer.index');
+    Route::get('/cash-drawer/create', [\App\Http\Controllers\POS\CashDrawerController::class, 'create'])->name('cash-drawer.create');
+    Route::post('/cash-drawer', [\App\Http\Controllers\POS\CashDrawerController::class, 'store'])->name('cash-drawer.store');
+    Route::get('/cash-drawer/{id}', [\App\Http\Controllers\POS\CashDrawerController::class, 'show'])->name('cash-drawer.show');
+    Route::get('/cash-drawer/{id}/close', [\App\Http\Controllers\POS\CashDrawerController::class, 'close'])->name('cash-drawer.close');
+    Route::put('/cash-drawer/{id}', [\App\Http\Controllers\POS\CashDrawerController::class, 'update'])->name('cash-drawer.update');
+});
+
+// Super Admin Hardware Management Routes
+Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin/hardware')->name('superadmin.hardware.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'index'])->name('index');
+    Route::get('/business/{business}', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'show'])->name('show');
+    Route::get('/business/{business}/configure-version', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'configureVersion'])->name('configure-version');
+    Route::post('/business/{business}/update-version', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'updateVersion'])->name('update-version');
+    Route::get('/business/{business}/device/create', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'createDevice'])->name('create-device');
+    Route::post('/business/{business}/device', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'storeDevice'])->name('store-device');
+    Route::get('/business/{business}/device/{device}/edit', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'editDevice'])->name('edit-device');
+    Route::put('/business/{business}/device/{device}', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'updateDevice'])->name('update-device');
+    Route::get('/business/{business}/device/{device}/toggle', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'toggleDevice'])->name('toggle-device');
+    Route::delete('/business/{business}/device/{device}', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'deleteDevice'])->name('delete-device');
+    Route::get('/business/{business}/audit-logs', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'auditLogs'])->name('audit-logs');
+    Route::post('/business/{business}/device/{device}/test', [\App\Http\Controllers\SuperAdmin\HardwareManagementController::class, 'testDevice'])->name('test-device');
 });

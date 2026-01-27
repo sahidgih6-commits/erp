@@ -31,6 +31,7 @@
                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">পরিশোধিত</th>
                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 hidden md:table-cell">বকেয়া</th>
                     <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 hidden lg:table-cell">লাভ</th>
+                    <th class="px-3 sm:px-6 py-3 text-center text-xs font-medium text-gray-500">ছবি</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -55,10 +56,20 @@
                         </span>
                     </td>
                     <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-blue-600 font-semibold hidden lg:table-cell">৳{{ number_format($sale->profit, 2) }}</td>
+                    <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
+                        @if($sale->voucher_image)
+                            <button onclick="showVoucherImage('{{ asset('storage/' . $sale->voucher_image) }}', '{{ $sale->voucher_number }}')" 
+                                    class="text-blue-600 hover:text-blue-800 text-2xl" title="ভাউচার ছবি দেখুন">
+                                📷
+                            </button>
+                        @else
+                            <span class="text-gray-300">-</span>
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" class="px-6 py-8 text-center text-gray-500">
+                    <td colspan="11" class="px-6 py-8 text-center text-gray-500">
                         কোন বিক্রয় নেই
                     </td>
                 </tr>
@@ -71,4 +82,45 @@
         {{ $sales->links() }}
     </div>
 </div>
+
+<!-- Voucher Image Modal -->
+<div id="voucherImageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4" onclick="closeVoucherImage()">
+    <div class="relative max-w-4xl w-full bg-white rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-800" id="modalTitle">ভাউচার ছবি</h3>
+            <button onclick="closeVoucherImage()" class="text-gray-600 hover:text-gray-900 text-2xl">&times;</button>
+        </div>
+        <div class="p-4">
+            <img id="modalImage" src="" alt="Voucher" class="max-w-full h-auto rounded shadow-lg mx-auto">
+        </div>
+        <div class="p-4 border-t flex justify-end gap-2">
+            <a id="downloadLink" href="" download class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                ডাউনলোড করুন
+            </a>
+            <button onclick="closeVoucherImage()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                বন্ধ করুন
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function showVoucherImage(imageUrl, voucherNumber) {
+    document.getElementById('modalImage').src = imageUrl;
+    document.getElementById('modalTitle').textContent = 'ভাউচার: ' + voucherNumber;
+    document.getElementById('downloadLink').href = imageUrl;
+    document.getElementById('voucherImageModal').classList.remove('hidden');
+}
+
+function closeVoucherImage() {
+    document.getElementById('voucherImageModal').classList.add('hidden');
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeVoucherImage();
+    }
+});
+</script>
 @endsection

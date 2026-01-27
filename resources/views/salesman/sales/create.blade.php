@@ -135,7 +135,7 @@
         </div>
 
         <!-- Form Submission -->
-        <form method="POST" action="{{ route($routePrefix . '.sales.store') }}" id="saleForm">
+        <form method="POST" action="{{ route($routePrefix . '.sales.store') }}" id="saleForm" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="cart_data" id="cart_data">
             
@@ -220,6 +220,27 @@
                 </div>
             </div>
             @endif
+
+            <!-- Offline Voucher Image Upload -->
+            <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                <label for="voucher_image" class="block text-gray-700 text-sm font-bold mb-2">
+                    📸 অফলাইন ভাউচার ছবি আপলোড করুন (ঐচ্ছিক)
+                </label>
+                <p class="text-xs text-gray-600 mb-3">সব ধরনের ছবি সাপোর্ট করে (JPG, PNG, GIF, WEBP) - স্বয়ংক্রিয় কম্প্রেশন হবে</p>
+                <input type="file" 
+                       name="voucher_image" 
+                       id="voucher_image" 
+                       accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                       class="shadow border rounded w-full py-2 px-3 text-sm text-gray-700 @error('voucher_image') border-red-500 @enderror"
+                       onchange="previewVoucherImage(this)">
+                @error('voucher_image')
+                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
+                <div id="voucher_preview" class="mt-3 hidden">
+                    <p class="text-xs font-semibold text-gray-700 mb-2">প্রিভিউ:</p>
+                    <img id="preview_img" src="" alt="Voucher Preview" class="max-w-xs rounded border shadow">
+                </div>
+            </div>
 
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:justify-between">
                 <a href="{{ route($routePrefix . '.sales.index') }}" class="w-full sm:w-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 sm:px-6 rounded text-sm sm:text-base text-center">
@@ -403,6 +424,22 @@ function updateDue() {
     const grandTotalText = document.getElementById('grand_total').textContent;
     const grandTotal = parseFloat(grandTotalText.replace('৳', '')) || 0;
     updateDueFromCart(grandTotal);
+}
+
+function previewVoucherImage(input) {
+    const preview = document.getElementById('voucher_preview');
+    const previewImg = document.getElementById('preview_img');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.classList.add('hidden');
+    }
 }
 
 // Initialize on page load

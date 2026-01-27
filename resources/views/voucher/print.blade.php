@@ -462,6 +462,20 @@
             </div>
         </div>
 
+        <!-- Offline Voucher Image -->
+        @if($sale->voucher_image)
+        <div class="section" style="margin-top: 15px; border: 2px dashed #d1d5db; padding: 10px; background: #f9fafb;">
+            <div class="section-title" style="text-align: center; margin-bottom: 8px; color: {{ $primaryColor }};">
+                📸 অফলাইন ভাউচার ছবি / Offline Voucher Image
+            </div>
+            <div style="text-align: center;">
+                <img src="{{ asset('storage/' . $sale->voucher_image) }}" 
+                     alt="Voucher Image" 
+                     style="max-width: 100%; max-height: 300px; border: 1px solid #d1d5db; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            </div>
+        </div>
+        @endif
+
         <!-- Footer -->
         <div class="footer">
             @if($template && $template->footer_text)

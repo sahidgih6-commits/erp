@@ -29,6 +29,19 @@
         <form method="POST" action="{{ route($routePrefix . '.stock.store') }}" id="existingProductForm">
             @csrf
 
+            <!-- Barcode Scanner Input -->
+            <div class="mb-4">
+                <label for="barcode_scanner" class="block text-gray-700 text-sm font-bold mb-2">
+                    📷 বারকোড স্ক্যান করুন (পণ্য স্বয়ংক্রিয়ভাবে নির্বাচিত হবে)
+                </label>
+                <input type="text" id="barcode_scanner" 
+                       placeholder="এখানে বারকোড স্ক্যান করুন বা টাইপ করুন..."
+                       class="shadow border border-blue-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-sm text-gray-600 mt-1">
+                    💡 স্ক্যানারে বারকোড স্ক্যান করুন অথবা ম্যানুয়ালি নিচে থেকে পণ্য বেছে নিন
+                </p>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div>
                     <label for="product_id" class="block text-gray-700 text-sm font-bold mb-2">পণ্য নির্বাচন করুন *</label>
@@ -205,6 +218,70 @@
 </div>
 
 <script>
+    // Barcode scanner auto-select product
+    const barcodeInput = document.getElementById('barcode_scanner');
+    let barcodeTimeout;
+    
+    barcodeInput.addEventListener('input', function(e) {
+        clearTimeout(barcodeTimeout);
+        const barcode = this.value.trim();
+        
+        if (barcode.length >= 3) {
+            barcodeTimeout = setTimeout(() => {
+                selectProductByBarcode(barcode);
+            }, 500); // Wait 500ms after last input
+        }
+    });
+    
+    barcodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(barcodeTimeout);
+            const barcode = this.value.trim();
+            selectProductByBarcode(barcode);
+        }
+    });
+    
+    function selectProductByBarcode(barcode) {
+        if (!barcode) return;
+        
+        const products = @json($products);
+        const product = products.find(p => p.barcode === barcode || p.sku === barcode);
+        
+        if (product) {
+            // Select the product in dropdown
+            document.getElementById('product_id').value = product.id;
+            
+            // Trigger change event to auto-fill prices
+            const event = new Event('change');
+            document.getElementById('product_id').dispatchEvent(event);
+            
+            // Clear barcode input
+            barcodeInput.value = '';
+            barcodeInput.style.borderColor = '#10b981'; // Green
+            barcodeInput.style.backgroundColor = '#d1fae5'; // Light green
+            
+            // Focus on quantity
+            document.getElementById('quantity').focus();
+            
+            // Reset styling after 2 seconds
+            setTimeout(() => {
+                barcodeInput.style.borderColor = '';
+                barcodeInput.style.backgroundColor = '';
+            }, 2000);
+        } else {
+            // Product not found
+            barcodeInput.style.borderColor = '#ef4444'; // Red
+            barcodeInput.style.backgroundColor = '#fee2e2'; // Light red
+            
+            setTimeout(() => {
+                barcodeInput.style.borderColor = '';
+                barcodeInput.style.backgroundColor = '';
+                barcodeInput.value = '';
+            }, 2000);
+        }
+    }
+
     const toggleBtn = document.getElementById('toggleProductMode');
     const existingForm = document.getElementById('existingProductForm');
     const newForm = document.getElementById('newProductForm');

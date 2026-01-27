@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\ProfitRealization;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 
 class SaleController extends Controller
@@ -49,6 +50,7 @@ class SaleController extends Controller
             'is_credit' => ['nullable'],
             'paid_amount' => ['nullable', 'numeric', 'min:0'],
             'expected_clear_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'voucher_image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,gif,webp', 'max:10240'], // Max 10MB
         ];
 
         // If credit sale, customer fields are required
@@ -87,6 +89,13 @@ class SaleController extends Controller
         // Generate unique voucher number for this transaction
         $voucherNumber = 'V-' . date('YmdHis') . '-' . substr(uniqid(), -4);
 
+        // Handle voucher image upload with compression
+        $voucherImagePath = null;
+        if ($request->hasFile('voucher_image')) {
+            $imageService = app(ImageService::class);
+            $voucherImagePath = $imageService->uploadCompressed($request->file('voucher_image'), 'vouchers', 85);
+        }
+
         try {
             \DB::beginTransaction();
 
@@ -117,6 +126,7 @@ class SaleController extends Controller
                     'paid_amount' => $itemPaidAmount,
                     'expected_clear_date' => $validated['expected_clear_date'] ?? null,
                     'voucher_number' => $voucherNumber,
+                    'voucher_image' => $voucherImagePath,
                 ]);
 
                 $product->reduceStock($item['quantity']);

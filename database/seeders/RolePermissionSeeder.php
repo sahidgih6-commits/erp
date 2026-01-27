@@ -48,6 +48,7 @@ class RolePermissionSeeder extends Seeder
         $owner = Role::firstOrCreate(['name' => 'owner']);
         $manager = Role::firstOrCreate(['name' => 'manager']);
         $salesman = Role::firstOrCreate(['name' => 'salesman']);
+        $cashier = Role::firstOrCreate(['name' => 'cashier']);
 
         // Sync permissions for roles
         
@@ -90,6 +91,13 @@ class RolePermissionSeeder extends Seeder
 
         // Salesman
         $salesman->syncPermissions([
+            'view-products',
+            'create-sales',
+            'view-own-sales',
+        ]);
+
+        // Cashier (POS-only access)
+        $cashier->syncPermissions([
             'view-products',
             'create-sales',
             'view-own-sales',

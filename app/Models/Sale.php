@@ -13,27 +13,41 @@ class Sale extends Model
     protected $fillable = [
         'product_id',
         'user_id',
+        'customer_id',
         'customer_name',
         'customer_phone',
         'quantity',
         'sell_price',
         'total_amount',
+        'payment_method',
         'paid_amount',
+        'change_amount',
+        'discount_amount',
+        'discount_type',
         'due_amount',
+        'note',
+        'status',
         'expected_clear_date',
         'actual_clear_date',
         'payment_status',
         'profit',
         'voucher_number',
+        'voucher_image',
     ];
 
     protected $casts = [
         'sell_price' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'change_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'due_amount' => 'decimal:2',
         'profit' => 'decimal:2',
         'expected_clear_date' => 'date',
         'actual_clear_date' => 'date',
     ];
+
+    protected $appends = ['total', 'due'];
 
     // Relationships
     public function product()
@@ -44,6 +58,11 @@ class Sale extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function profitRealizations(): HasMany
@@ -61,6 +80,17 @@ class Sale extends Model
     public function getPendingProfitAttribute()
     {
         return $this->profit - $this->realized_profit;
+    }
+
+    // Accessor for backward compatibility
+    public function getTotalAttribute()
+    {
+        return $this->total_amount;
+    }
+
+    public function getDueAttribute()
+    {
+        return $this->due_amount;
     }
 
     // Boot method to calculate totals

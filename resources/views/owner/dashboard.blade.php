@@ -230,6 +230,20 @@
                 <a href="{{ route('owner.reports') }}" class="block bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
                     রিপোর্ট দেখুন
                 </a>
+                
+                @php
+                    $systemVersion = auth()->user()->business->systemVersion;
+                    $posEnabled = $systemVersion ? $systemVersion->isPOSEnabled() : false;
+                @endphp
+                
+                @if($posEnabled)
+                <a href="{{ route('owner.barcode.index') }}" class="block bg-teal-500 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
+                    🏷️ বারকোড প্রিন্ট করুন
+                </a>
+                <a href="{{ route('pos.dashboard') }}" class="block bg-cyan-500 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
+                    💳 POS সিস্টেম
+                </a>
+                @endif
             </div>
         </div>
     </div>

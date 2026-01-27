@@ -5,10 +5,18 @@ namespace App\Http\Controllers\Manager;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Business;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index()
     {
         $businessId = $this->getBusinessId();
@@ -27,6 +35,7 @@ class ProductController extends Controller
         
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'category_id' => ['nullable', 'exists:categories,id'],
             'sku' => [
                 'required', 
                 'string', 
@@ -35,9 +44,30 @@ class ProductController extends Controller
                     return $query->where('business_id', $businessId);
                 })
             ],
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('products')->where(function ($query) use ($businessId) {
+                    return $query->where('business_id', $businessId);
+                })
+            ],
+            'image' => ['nullable', 'image', 'max:2048'],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'sell_price' => ['required', 'numeric', 'min:0'],
+            'unit' => ['nullable', 'string', 'max:50'],
+            'min_stock_level' => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        // Auto-generate barcode if not provided
+        if (empty($validated['barcode'])) {
+            $validated['barcode'] = $this->generateUniqueBarcode($businessId);
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->imageService->store($request->file('image'), 'products');
+        }
 
         $validated['business_id'] = $businessId;
         Product::create($validated);
@@ -75,16 +105,30 @@ class ProductController extends Controller
                     return $query->where('business_id', $businessId);
                 })->ignore($product->id)
             ],
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('products')->where(function ($query) use ($businessId) {
+                    return $query->where('business_id', $businessId);
+                })->ignore($product->id)
+            ],
             'purchase_price' => ['required', 'numeric', 'min:0'],
             'sell_price' => ['required', 'numeric', 'min:0'],
             'adjust_type' => ['nullable', 'in:increase,decrease'],
             'adjust_quantity' => ['nullable', 'numeric', 'min:0'],
         ]);
 
+        // Auto-generate barcode if empty
+        if (empty($validated['barcode']) && empty($product->barcode)) {
+            $validated['barcode'] = $this->generateUniqueBarcode($businessId);
+        }
+
         // Update product details
         $product->update([
             'name' => $validated['name'],
             'sku' => $validated['sku'],
+            'barcode' => $validated['barcode'] ?? $product->barcode,
             'purchase_price' => $validated['purchase_price'],
             'sell_price' => $validated['sell_price'],
         ]);
@@ -171,5 +215,33 @@ class ProductController extends Controller
         $user->save();
 
         return $business->id;
+    }
+
+    /**
+     * Generate a unique barcode for a product.
+     */
+    private function generateUniqueBarcode($businessId): string
+    {
+        do {
+            // Generate 13-digit EAN-13 compatible barcode
+            // Format: 2 (custom prefix) + 10 random digits + 1 check digit
+            $barcode = '2' . str_pad(mt_rand(0, 9999999999), 10, '0', STR_PAD_LEFT);
+            
+            // Calculate EAN-13 check digit
+            $sum = 0;
+            for ($i = 0; $i < 12; $i++) {
+                $sum += (int)$barcode[$i] * (($i % 2 === 0) ? 1 : 3);
+            }
+            $checkDigit = (10 - ($sum % 10)) % 10;
+            $barcode .= $checkDigit;
+            
+            // Check if barcode already exists in this business
+            $exists = Product::where('business_id', $businessId)
+                ->where('barcode', $barcode)
+                ->exists();
+                
+        } while ($exists);
+        
+        return $barcode;
     }
 }

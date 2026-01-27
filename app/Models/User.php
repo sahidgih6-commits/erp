@@ -96,6 +96,11 @@ class User extends Authenticatable
         return $this->hasRole('salesman');
     }
 
+    public function isCashier(): bool
+    {
+        return $this->hasRole('cashier');
+    }
+
     // Check if due system is enabled for this user or their owner
     public function isDueSystemEnabled(): bool
     {
@@ -132,6 +137,8 @@ class User extends Authenticatable
             return 'owner.dashboard';
         } elseif ($this->isManager()) {
             return 'manager.dashboard';
+        } elseif ($this->isCashier()) {
+            return 'pos.dashboard'; // Cashier goes to POS
         } else {
             return 'salesman.dashboard';
         }

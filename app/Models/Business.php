@@ -33,4 +33,29 @@ class Business extends Model
     {
         return $this->hasOne(VoucherTemplate::class, 'business_id');
     }
+
+    public function systemVersion(): HasMany
+    {
+        return $this->hasMany(SystemVersion::class);
+    }
+
+    public function hardwareDevices(): HasMany
+    {
+        return $this->hasMany(HardwareDevice::class);
+    }
+
+    public function hardwareAuditLogs(): HasMany
+    {
+        return $this->hasMany(HardwareAuditLog::class);
+    }
+
+    public function posTransactions(): HasMany
+    {
+        return $this->hasMany(POSTransaction::class);
+    }
+
+    public function receiptPrints(): HasMany
+    {
+        return $this->hasMany(ReceiptPrint::class);
+    }
 }

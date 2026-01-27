@@ -30,6 +30,20 @@ class ImageService
     }
 
     /**
+     * Store an image and return the path
+     */
+    public function store(UploadedFile $file, string $path = 'uploads'): string
+    {
+        // Generate unique filename
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        
+        // Store file to configured disk
+        $file->storeAs($path, $filename, $this->disk);
+
+        return $path . '/' . $filename;
+    }
+
+    /**
      * Upload thumbnail version
      * Note: Install intervention/image package for advanced image manipulation
      */
@@ -57,6 +71,84 @@ class ImageService
         }
 
         return false;
+    }
+
+    /**
+     * Upload and compress image without losing quality
+     * Supports: jpg, jpeg, png, webp, gif
+     */
+    public function uploadCompressed(UploadedFile $file, string $path = 'vouchers', int $quality = 85): string
+    {
+        // Generate unique filename
+        $extension = strtolower($file->getClientOriginalExtension());
+        $filename = time() . '_' . uniqid() . '.' . $extension;
+        $fullPath = $path . '/' . $filename;
+
+        // Get image contents
+        $imageContent = file_get_contents($file->getRealPath());
+        
+        // Create image resource based on type
+        $image = null;
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+                $image = imagecreatefromjpeg($file->getRealPath());
+                break;
+            case 'png':
+                $image = imagecreatefrompng($file->getRealPath());
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+                break;
+            case 'gif':
+                $image = imagecreatefromgif($file->getRealPath());
+                break;
+            case 'webp':
+                $image = imagecreatefromwebp($file->getRealPath());
+                break;
+            default:
+                // If not supported, just store without compression
+                $file->storeAs($path, $filename, $this->disk);
+                return $path . '/' . $filename;
+        }
+
+        if (!$image) {
+            // Fallback: store without compression
+            $file->storeAs($path, $filename, $this->disk);
+            return $path . '/' . $filename;
+        }
+
+        // Create temp path for compressed image
+        $tempPath = sys_get_temp_dir() . '/' . $filename;
+
+        // Save compressed image
+        switch ($extension) {
+            case 'jpg':
+            case 'jpeg':
+                imagejpeg($image, $tempPath, $quality);
+                break;
+            case 'png':
+                // PNG quality is 0-9 (0 = no compression, 9 = max compression)
+                $pngQuality = (int)((100 - $quality) / 10);
+                imagepng($image, $tempPath, $pngQuality);
+                break;
+            case 'gif':
+                imagegif($image, $tempPath);
+                break;
+            case 'webp':
+                imagewebp($image, $tempPath, $quality);
+                break;
+        }
+
+        // Free memory
+        imagedestroy($image);
+
+        // Store compressed image
+        Storage::disk($this->disk)->put($fullPath, file_get_contents($tempPath));
+
+        // Delete temp file
+        @unlink($tempPath);
+
+        return $path . '/' . $filename;
     }
 
     /**

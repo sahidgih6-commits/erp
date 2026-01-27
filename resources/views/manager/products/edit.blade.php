@@ -33,6 +33,17 @@
             </div>
 
             <div class="mb-4">
+                <label for="barcode" class="block text-gray-700 text-sm font-bold mb-2">বারকোড (খালি রাখলে স্বয়ংক্রিয়ভাবে তৈরি হবে)</label>
+                <input type="text" name="barcode" id="barcode" value="{{ old('barcode', $product->barcode) }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 @error('barcode') border-red-500 @enderror" placeholder="স্বয়ংক্রিয়">
+                @error('barcode')
+                    <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-sm text-gray-600 mt-1">
+                    💡 খালি রেখে দিলে সিস্টেম নিজে থেকে একটি ইউনিক বারকোড তৈরি করবে
+                </p>
+            </div>
+
+            <div class="mb-4">
                 <label for="purchase_price" class="block text-gray-700 text-sm font-bold mb-2">ক্রয় মূল্য</label>
                 <input type="number" step="0.01" name="purchase_price" id="purchase_price" value="{{ old('purchase_price', $product->purchase_price) }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 @error('purchase_price') border-red-500 @enderror" required>
                 @error('purchase_price')
