@@ -34,9 +34,9 @@ class Business extends Model
         return $this->hasOne(VoucherTemplate::class, 'business_id');
     }
 
-    public function systemVersion(): HasMany
+    public function systemVersion()
     {
-        return $this->hasMany(SystemVersion::class);
+        return $this->hasOne(SystemVersion::class);
     }
 
     public function hardwareDevices(): HasMany
