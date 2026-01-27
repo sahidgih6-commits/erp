@@ -253,6 +253,7 @@ class OwnerController extends Controller
                 'customer_name' => $first->customer_name,
                 'customer_phone' => $first->customer_phone,
                 'salesman' => $first->user->name,
+                'voucher_image' => $first->voucher_image,
                 'products' => $group->map(function($sale) { return $sale->product->name; })->implode(', '),
                 'quantity' => $group->sum('quantity'),
                 'total_amount' => $group->sum('total_amount'),
