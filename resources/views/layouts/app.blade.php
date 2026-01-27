@@ -96,9 +96,17 @@
                         </span>
                     @endauth
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-center gap-3">
                     @auth
-                        <span class="text-sm text-gray-700 mr-4">{{ auth()->user()->name }}</span>
+                        <!-- Language Switcher -->
+                        <div class="relative">
+                            <select onchange="window.location.href=this.value" class="bg-white border border-gray-300 text-gray-700 py-2 px-3 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="{{ route('locale', 'bn') }}" {{ session('locale', 'bn') == 'bn' ? 'selected' : '' }}>🇧🇩 বাংলা</option>
+                                <option value="{{ route('locale', 'en') }}" {{ session('locale', 'bn') == 'en' ? 'selected' : '' }}>🇬🇧 English</option>
+                            </select>
+                        </div>
+                        
+                        <span class="text-sm text-gray-700">{{ auth()->user()->name }}</span>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
