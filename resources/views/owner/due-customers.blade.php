@@ -98,10 +98,27 @@
                             @endif
                         </td>
                         <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm">
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1 items-start">
                                 <a href="{{ route('owner.voucher.print', $sale->id) }}" target="_blank" class="text-blue-600 hover:text-blue-900 font-mono">
                                     {{ $sale->voucher_number ?? 'N/A' }}
                                 </a>
+                                
+                                @if(!empty($sale->voucher_image))
+                                    <button type="button" onclick="openImageModal('{{ Storage::url($sale->voucher_image) }}')" class="text-xs text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 focus:outline-none">
+                                        📷 ছবি দেখুন
+                                    </button>
+                                @endif
+                                
+                                <form action="{{ route('owner.sales.upload-image') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <input type="hidden" name="voucher_number" value="{{ $sale->voucher_number }}">
+                                    <label class="cursor-pointer inline-flex items-center gap-1 text-xs bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded px-2 py-1 text-gray-700 transition-colors">
+                                        <span>📤</span> 
+                                        <span>আপলোড</span>
+                                        <input type="file" name="voucher_image" class="hidden" onchange="this.form.submit()">
+                                    </label>
+                                </form>
+
                                 @if($sale->profitRealizations->count() > 0)
                                     <div class="text-xs text-gray-500">
                                         @foreach($sale->profitRealizations as $pr)
@@ -132,3 +149,48 @@
     </div>
 </div>
 @endsection
+
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 z-[100] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-90 transition-opacity" aria-hidden="true" onclick="closeImageModal()"></div>
+
+        <!-- This element is to trick the browser into centering the modal contents. -->
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-transparent rounded-lg text-left overflow-hidden transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full">
+             <div class="relative">
+                <button type="button" class="absolute -top-10 right-0 text-white hover:text-gray-300 focus:outline-none" onclick="closeImageModal()">
+                    <span class="sr-only">Close</span>
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <img id="modalImage" src="" alt="Voucher Scan" class="w-full h-auto max-h-[85vh] object-contain mx-auto rounded-lg bg-white">
+             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openImageModal(url) {
+        document.getElementById('modalImage').src = url;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling background
+    }
+
+    function closeImageModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.getElementById('modalImage').src = '';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            closeImageModal();
+        }
+    });
+</script>
