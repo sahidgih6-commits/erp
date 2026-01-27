@@ -106,7 +106,7 @@
                 </svg>
                 <div>
                     <h3 class="font-semibold text-gray-900">{{ __('pos.billing') }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('pos.new_transaction') ?? 'Create new transaction' }}</p>
+                    <p class="text-sm text-gray-600">{{ __('pos.new_transaction') }}</p>
                 </div>
             </a>
 
@@ -115,8 +115,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div>
-                    <h3 class="font-semibold text-gray-900">{{ __('pos.transaction_history') ?? 'Transaction History' }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('pos.view_transactions') ?? 'View past transactions' }}</p>
+                    <h3 class="font-semibold text-gray-900">{{ __('pos.transaction_history') }}</h3>
+                    <p class="text-sm text-gray-600">{{ __('pos.view_transactions') }}</p>
                 </div>
             </a>
 
@@ -126,7 +126,7 @@
                 </svg>
                 <div>
                     <h3 class="font-semibold text-gray-900">{{ __('pos.sales_summary') }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('messages.view_reports') ?? 'View sales reports' }}</p>
+                    <p class="text-sm text-gray-600">{{ __('pos.view_reports') }}</p>
                 </div>
             </a>
         </div>
@@ -138,7 +138,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded">
                 <div>
-                    <p class="text-sm text-gray-600">{{ __('messages.current_version') ?? 'Current Version' }}</p>
+                    <p class="text-sm text-gray-600">{{ __('pos.current_version') }}</p>
                     <p class="font-semibold text-gray-900 mt-1">
                         @if($systemVersion?->version === 'enterprise')
                             {{ __('pos.enterprise_version') }}
@@ -162,7 +162,7 @@
 
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded">
                 <div>
-                    <p class="text-sm text-gray-600">{{ __('messages.features') ?? 'Features Enabled' }}</p>
+                    <p class="text-sm text-gray-600">{{ __('pos.features') }}</p>
                     <ul class="text-sm text-gray-900 mt-1 space-y-1">
                         <li>{{ $systemVersion?->barcode_scanner_enabled ? '✓' : '✗' }} {{ __('pos.barcode_scanner') }}</li>
                         <li>{{ $systemVersion?->thermal_printer_enabled ? '✓' : '✗' }} {{ __('pos.thermal_printer') }}</li>
@@ -172,12 +172,12 @@
 
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded">
                 <div>
-                    <p class="text-sm text-gray-600">{{ __('messages.last_update') ?? 'Last Updated' }}</p>
+                    <p class="text-sm text-gray-600">{{ __('pos.last_update') }}</p>
                     <p class="font-semibold text-gray-900 mt-1">
                         @if($systemVersion?->upgraded_at)
                             {{ $systemVersion->upgraded_at->format('d M Y') }}
                         @else
-                            {{ __('messages.not_updated') ?? 'Never' }}
+                            {{ __('pos.not_updated') }}
                         @endif
                     </p>
                 </div>

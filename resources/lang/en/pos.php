@@ -14,6 +14,24 @@ return [
     'daily_sales' => 'Daily Sales',
     'not_configured' => 'Not Configured',
     'quick_actions' => 'Quick Actions',
+    'main_dashboard' => 'Main Dashboard',
+    
+    // Quick Actions
+    'new_transaction' => 'Create new transaction',
+    'transaction_history' => 'Transaction History',
+    'view_transactions' => 'View past transactions',
+    'sales_summary' => 'Sales Summary',
+    'view_reports' => 'View sales reports',
+    
+    // System Version
+    'system_version' => 'System Version',
+    'current_version' => 'Current Version',
+    'enterprise_version' => 'Professional',
+    'pro_version' => 'Professional',
+    'basic_version' => 'Basic',
+    'features' => 'Features Enabled',
+    'last_update' => 'Last Updated',
+    'not_updated' => 'Never',
 
     // Hardware
     'hardware' => 'Hardware',

@@ -14,6 +14,24 @@ return [
     'daily_sales' => 'দৈনিক বিক্রয়',
     'not_configured' => 'কনফিগার করা হয়নি',
     'quick_actions' => 'দ্রুত কাজ',
+    'main_dashboard' => 'মূল ড্যাশবোর্ড',
+    
+    // Quick Actions
+    'new_transaction' => 'নতুন লেনদেন তৈরি করুন',
+    'transaction_history' => 'লেনদেন ইতিহাস',
+    'view_transactions' => 'পূর্ববর্তী লেনদেন দেখুন',
+    'sales_summary' => 'বিক্রয় সারসংক্ষেপ',
+    'view_reports' => 'বিক্রয় রিপোর্ট দেখুন',
+    
+    // System Version
+    'system_version' => 'সিস্টেম সংস্করণ',
+    'current_version' => 'বর্তমান সংস্করণ',
+    'enterprise_version' => 'পেশাদার',
+    'pro_version' => 'পেশাদার',
+    'basic_version' => 'মৌলিক',
+    'features' => 'সক্রিয় বৈশিষ্ট্য',
+    'last_update' => 'সর্বশেষ আপডেট',
+    'not_updated' => 'কখনো নয়',
 
     // Hardware
     'hardware' => 'হার্ডওয়্যার',
