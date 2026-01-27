@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Business;
+use App\Models\SystemVersion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -41,6 +42,20 @@ class OwnerController extends Controller
         ]);
 
         $owner->assignRole('owner');
+
+        // Auto-enable POS system for the business if not already enabled
+        $business = Business::find($validated['business_id']);
+        if ($business && !$business->systemVersion) {
+            SystemVersion::create([
+                'business_id' => $business->id,
+                'version' => 'pro',
+                'pos_enabled' => true,
+                'barcode_scanner_enabled' => true,
+                'thermal_printer_enabled' => true,
+                'cash_drawer_enabled' => true,
+                'pos_activated_at' => now(),
+            ]);
+        }
 
         // Store login credentials in session to show once
         session()->flash('owner_created', [

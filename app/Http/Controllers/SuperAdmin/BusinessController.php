@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Business;
+use App\Models\SystemVersion;
 use App\Models\VoucherTemplate;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -43,6 +44,17 @@ class BusinessController extends Controller
         ]);
 
         $business = Business::create($validated);
+
+        // Auto-enable POS system for every new business
+        SystemVersion::create([
+            'business_id' => $business->id,
+            'version' => 'pro',
+            'pos_enabled' => true,
+            'barcode_scanner_enabled' => true,
+            'thermal_printer_enabled' => true,
+            'cash_drawer_enabled' => true,
+            'pos_activated_at' => now(),
+        ]);
 
         return redirect()->route('superadmin.businesses.index')
             ->with('success', 'Company created successfully!');
@@ -156,6 +168,19 @@ class BusinessController extends Controller
         ]);
 
         $owner->assignRole('owner');
+
+        // Auto-enable POS system if not already enabled
+        if (!$business->systemVersion) {
+            SystemVersion::create([
+                'business_id' => $business->id,
+                'version' => 'pro',
+                'pos_enabled' => true,
+                'barcode_scanner_enabled' => true,
+                'thermal_printer_enabled' => true,
+                'cash_drawer_enabled' => true,
+                'pos_activated_at' => now(),
+            ]);
+        }
 
         // Store login credentials in session to show once
         session()->flash('owner_created', [

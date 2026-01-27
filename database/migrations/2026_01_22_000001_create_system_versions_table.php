@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('system_versions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('business_id')->constrained('businesses')->onDelete('cascade');
-            $table->enum('version', ['basic', 'pro', 'enterprise'])->default('basic');
-            $table->boolean('pos_enabled')->default(false); // Super Admin activates POS
-            $table->boolean('barcode_scanner_enabled')->default(false);
-            $table->boolean('thermal_printer_enabled')->default(false);
-            $table->boolean('cash_drawer_enabled')->default(false);
+            $table->enum('version', ['basic', 'pro', 'enterprise'])->default('pro');
+            $table->boolean('pos_enabled')->default(true); // POS auto-enabled for all businesses
+            $table->boolean('barcode_scanner_enabled')->default(true);
+            $table->boolean('thermal_printer_enabled')->default(true);
+            $table->boolean('cash_drawer_enabled')->default(true);
             $table->timestamp('pos_activated_at')->nullable();
             $table->timestamp('upgraded_at')->nullable();
             $table->string('upgrade_notes')->nullable();
