@@ -30,6 +30,9 @@ return [
     'total_due' => 'Total Due',
     'monthly_profit' => 'Monthly Profit',
     'total_profit' => 'Total Profit',
+    'monthly_expenses' => 'Monthly Expenses',
+    'net_profit' => 'Net Profit',
+    'cash_in_hand' => 'Cash in Hand',
     
     // Recent Sales
     'recent_sales' => 'Recent Sales',
@@ -39,9 +42,27 @@ return [
     
     // Quick Actions
     'quick_actions' => 'Quick Actions',
-    'new_sale' => 'New Sale',
+    'new_sale' => 'Create New Sale',
     'stock_management' => 'Stock Management',
     'view_reports' => 'View Reports',
     'print_barcode' => 'Print Barcode',
     'pos_system' => 'POS System',
+    'customer_management' => 'Customer Management',
+    'product_categories' => 'Product Categories',
+    'user_management' => 'User Management',
+    'expense_management' => 'Expense Management',
+    
+    // Additional translations
+    'this_month_sales' => 'This Month Sales',
+    'this_month_profit' => 'This Month Total Profit',
+    'without_expenses' => 'Without Expenses',
+    'with_expenses' => 'With Expenses',
+    'all_expenses' => 'All Expenses',
+    'product' => 'Product',
+    'salesman' => 'Salesman',
+    'no_sales' => 'No sales',
+    'create_new_sale' => 'Create New Sale',
+    'manager_management' => 'Manager Management',
+    'product_management' => 'Product Management',
+    'stock_management' => 'Stock Management',
 ];

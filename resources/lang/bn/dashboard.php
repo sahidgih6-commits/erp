@@ -30,6 +30,9 @@ return [
     'total_due' => 'মোট বাকি',
     'monthly_profit' => 'মাসের লাভ',
     'total_profit' => 'মোট লাভ',
+    'monthly_expenses' => 'মাসের খরচ',
+    'net_profit' => 'নীট লাভ',
+    'cash_in_hand' => 'হাতে নগদ',
     
     // Recent Sales
     'recent_sales' => 'সাম্প্রতিক বিক্রয়',
@@ -44,4 +47,20 @@ return [
     'view_reports' => 'রিপোর্ট দেখুন',
     'print_barcode' => 'বারকোড প্রিন্ট করুন',
     'pos_system' => 'POS সিস্টেম',
-];
+    'customer_management' => 'গ্রাহক ব্যবস্থাপনা',
+    'product_categories' => 'পণ্য শ্রেণীবিভাগ',
+    'user_management' => 'ব্যবহারকারী ব্যবস্থাপনা',
+    'expense_management' => 'ব্যয় ব্যবস্থাপনা',    
+    // Additional translations
+    'this_month_sales' => 'এই মাসের বিক্রয়',
+    'this_month_profit' => 'এই মাসের মোট লাভ',
+    'without_expenses' => 'খরচ ছাড়া',
+    'with_expenses' => 'খরচ সহ',
+    'all_expenses' => 'সব ধরনের খরচ',
+    'product' => 'পণ্য',
+    'salesman' => 'সেলসম্যান',
+    'no_sales' => 'কোন বিক্রয় নেই',
+    'create_new_sale' => 'নতুন বিক্রয় তৈরি করুন',
+    'manager_management' => 'ম্যানেজার পরিচালনা',
+    'product_management' => 'পণ্য পরিচালনা',
+    'stock_management' => 'স্টক পরিচালনা',];

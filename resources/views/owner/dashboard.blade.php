@@ -149,23 +149,23 @@
     @else
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 border-l-4 border-green-500">
-            <div class="text-xs sm:text-sm text-gray-600">এই মাসের বিক্রয়</div>
+            <div class="text-xs sm:text-sm text-gray-600">{{ __('dashboard.this_month_sales') }}</div>
             <div class="text-2xl sm:text-3xl font-bold text-green-600">৳{{ bn_number(number_format($monthSales, 2)) }}</div>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 border-l-4 border-blue-500">
-            <div class="text-xs sm:text-sm text-gray-600">এই মাসের মোট লাভ</div>
+            <div class="text-xs sm:text-sm text-gray-600">{{ __('dashboard.this_month_profit') }}</div>
             <div class="text-2xl sm:text-3xl font-bold text-blue-600">৳{{ bn_number(number_format($monthProfit, 2)) }}</div>
-            <div class="text-xs text-gray-500 mt-1">(খরচ ছাড়া)</div>
+            <div class="text-xs text-gray-500 mt-1">({{ __('dashboard.without_expenses') }})</div>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 border-l-4 border-emerald-500">
-            <div class="text-xs sm:text-sm text-gray-600">এই মাসের লাভ</div>
+            <div class="text-xs sm:text-sm text-gray-600">{{ __('dashboard.month_profit') }}</div>
             <div class="text-2xl sm:text-3xl font-bold text-emerald-600">৳{{ bn_number(number_format($monthProfit - $monthExpenses, 2)) }}</div>
-            <div class="text-xs text-gray-500 mt-1">(খরচ সহ)</div>
+            <div class="text-xs text-gray-500 mt-1">({{ __('dashboard.with_expenses') }})</div>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 border-l-4 border-red-500">
-            <div class="text-xs sm:text-sm text-gray-600">মাসের খরচ</div>
+            <div class="text-xs sm:text-sm text-gray-600">{{ __('dashboard.monthly_expenses') }}</div>
             <div class="text-2xl sm:text-3xl font-bold text-red-600">৳{{ bn_number(number_format($monthExpenses, 2)) }}</div>
-            <div class="text-xs text-gray-500 mt-1">(সব ধরনের খরচ)</div>
+            <div class="text-xs text-gray-500 mt-1">({{ __('dashboard.all_expenses') }})</div>
         </div>
     </div>
     @endif
@@ -175,14 +175,14 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6 lg:mb-8">
         <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">সাম্প্রতিক বিক্রয়</h2>
+            <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{{ __('dashboard.recent_sales') }}</h2>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-xs sm:text-sm">
                     <thead>
                         <tr class="border-b">
-                            <th class="text-left py-2">পণ্য</th>
-                            <th class="text-left py-2">সেলসম্যান</th>
-                            <th class="text-left py-2">পরিমাণ</th>
+                            <th class="text-left py-2">{{ __('dashboard.product') }}</th>
+                            <th class="text-left py-2">{{ __('dashboard.salesman') }}</th>
+                            <th class="text-left py-2">{{ __('dashboard.amount') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -194,7 +194,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="py-4 text-center text-gray-500">কোন বিক্রয় নেই</td>
+                            <td colspan="3" class="py-4 text-center text-gray-500">{{ __('dashboard.no_sales') }}</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -202,22 +202,22 @@
             </div>
         </div>
         <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-            <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">দ্রুত কাজ</h2>
+            <h2 class="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{{ __('dashboard.quick_actions') }}</h2>
             <div class="space-y-2">
                 <a href="{{ route('owner.sales.create') }}" class="block bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    নতুন বিক্রয় তৈরি করুন
+                    {{ __('dashboard.create_new_sale') }}
                 </a>
                 <a href="{{ route('owner.expenses.index') }}" class="block bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    খরচ ব্যবস্থাপনা
+                    {{ __('dashboard.expense_management') }}
                 </a>
                 <a href="{{ route('owner.managers.index') }}" class="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    ম্যানেজার পরিচালনা
+                    {{ __('dashboard.manager_management') }}
                 </a>
                 <a href="{{ route('owner.products.index') }}" class="block bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    পণ্য পরিচালনা
+                    {{ __('dashboard.product_management') }}
                 </a>
                 <a href="{{ route('owner.stock.index') }}" class="block bg-purple-500 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
-                    স্টক পরিচালনা
+                    {{ __('dashboard.stock_management') }}
                 </a>
                 @if(auth()->user()->isDueSystemEnabled())
                 <a href="{{ route('owner.due-customers') }}" class="block bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">

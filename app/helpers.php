@@ -2,13 +2,22 @@
 
 if (!function_exists('bn_number')) {
     /**
-     * Convert English numbers to Bengali numerals
+     * Convert English numbers to Bengali numerals (locale-aware)
      *
      * @param mixed $number
      * @return string
      */
     function bn_number($number)
     {
+        // Check current locale
+        $locale = session('locale', 'bn');
+        
+        // If English, return as is
+        if ($locale === 'en') {
+            return (string)$number;
+        }
+        
+        // Convert to Bengali numerals
         $bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         $englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         
