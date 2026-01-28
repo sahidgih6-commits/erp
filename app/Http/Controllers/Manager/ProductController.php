@@ -224,8 +224,8 @@ class ProductController extends Controller
     {
         do {
             // Generate 13-digit EAN-13 compatible barcode
-            // Format: 2 (custom prefix) + 10 random digits + 1 check digit
-            $barcode = '2' . str_pad(mt_rand(0, 9999999999), 10, '0', STR_PAD_LEFT);
+            // Format: 2 (custom prefix) + 11 random digits + 1 check digit
+            $barcode = '2' . str_pad(mt_rand(0, 99999999999), 11, '0', STR_PAD_LEFT);
             
             // Calculate EAN-13 check digit
             $sum = 0;
