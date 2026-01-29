@@ -172,7 +172,7 @@
                     বকেয়া পেমেন্ট নিন
                 </a>
                 @endif
-                <a href="{{ route('manager.reports') }}" class="block bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded text-center text-sm sm:text-base">
+                <a href="{{ route('manager.reports.index') }}" class="block bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded text-center text-sm sm:text-base">
                     রিপোর্ট দেখুন
                 </a>
             </div>
