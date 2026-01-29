@@ -86,16 +86,18 @@
                 <span class="font-semibold">৳ <span id="subtotal">0.00</span></span>
             </div>
             <div class="flex justify-between items-center">
-                <span>{{ __('pos.discount') }}:</span>
+                <span>{{ __('pos.discount') }} (%):</span>
                 <div class="flex items-center gap-2">
                     <input type="number" 
                            id="discountInput" 
                            value="0" 
                            min="0" 
-                           step="0.01" 
+                           max="100"
+                           step="0.1" 
                            onchange="updateTotals()" 
                            oninput="updateTotals()"
-                           class="w-20 px-2 py-1 border border-gray-300 rounded text-xs text-right">
+                           placeholder="%"
+                           class="w-16 px-2 py-1 border border-gray-300 rounded text-xs text-right">
                     <span class="font-semibold text-xs">৳ <span id="discountAmount">0.00</span></span>
                 </div>
             </div>
@@ -277,7 +279,8 @@
     function updateTotals() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const discountInput = document.getElementById('discountInput');
-        const discount = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+        const discountPercent = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+        const discount = (subtotal * discountPercent) / 100; // Calculate percentage
         const tax = 0; // VAT/Tax disabled
         const total = subtotal - discount + tax;
         
@@ -329,6 +332,7 @@
             items: cart,
             subtotal: parseFloat(document.getElementById('subtotal').textContent),
             discount: parseFloat(document.getElementById('discountAmount').textContent),
+            discount_percent: parseFloat(document.getElementById('discountInput').value) || 0,
             tax: parseFloat(document.getElementById('taxAmount').textContent),
             total: total,
             payment_method: document.getElementById('paymentMethod').value,
@@ -363,9 +367,18 @@
     
     // Print receipt and reset
     function printReceiptAndReset(transactionId) {
-        // Open receipt in new window for printing
+        // Open receipt in popup window
         const receiptUrl = '{{ route("pos.receipt.view", "") }}/' + transactionId;
-        window.open(receiptUrl, '_blank', 'width=400,height=600');
+        const popup = window.open(receiptUrl, 'receipt', 'width=400,height=600,scrollbars=yes');
+        
+        // Auto-print when loaded
+        if (popup) {
+            popup.onload = function() {
+                setTimeout(function() {
+                    popup.print();
+                }, 500);
+            };
+        }
         
         // Print receipt if printer enabled
         @if($canPrintReceipt)

@@ -132,22 +132,22 @@
 </head>
 <body>
     <div class="receipt-header">
-        @if(($template->receipt_show_logo ?? true) && $template->logo_url)
+        @if($template && ($template->receipt_show_logo ?? true) && $template->logo_url)
             <img src="{{ $template->logo_url }}" alt="Logo" class="logo">
         @endif
         
         <div class="company-name">{{ $template->company_name ?? $business->name }}</div>
         
         <div class="company-info">
-            @if($template->company_address)
+            @if($template && $template->company_address)
                 {{ $template->company_address }}<br>
             @endif
-            @if($template->company_phone)
+            @if($template && $template->company_phone)
                 Tel: {{ $template->company_phone }}
             @endif
         </div>
         
-        @if($template->receipt_header_text)
+        @if($template && $template->receipt_header_text)
             <div class="header-text">{{ $template->receipt_header_text }}</div>
         @endif
     </div>
@@ -254,11 +254,20 @@
     @endif
     
     <div class="footer">
-        @if($template->receipt_footer_text)
+        @if($template && $template->receipt_footer_text)
             {{ $template->receipt_footer_text }}<br>
         @endif
         Thank you for your business!<br>
         Please come again
     </div>
+    
+    <script>
+        // Auto-print when page loads
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 300);
+        };
+    </script>
 </body>
 </html>

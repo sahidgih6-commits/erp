@@ -272,10 +272,10 @@ class POSDashboardController extends Controller
     public function viewReceipt(POSTransaction $transaction)
     {
         $business = $transaction->business;
-        $template = $business->voucherTemplate;
+        $template = $business->voucherTemplate ?? null;
         
         // Get customer info
-        $firstSale = \App\Models\Sale::where('voucher_number', $transaction->transaction_number)->first();
+        $firstSale = Sale::where('voucher_number', $transaction->transaction_number)->first();
         $customerName = $firstSale->customer_name ?? 'POS Customer';
         $customerPhone = $firstSale->customer_phone ?? null;
         
