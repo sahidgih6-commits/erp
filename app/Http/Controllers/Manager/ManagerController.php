@@ -28,7 +28,7 @@ class ManagerController extends Controller
         // Calculate today's realized profit (profit from paid sales + profit realizations from due payments)
         $todayRealizedProfit = ProfitRealization::whereIn('sale_id', function($query) use ($businessUserIds) {
             $query->select('id')->from('sales')->whereIn('user_id', $businessUserIds);
-        })->whereDate('created_at', Carbon::today())->sum('realized_profit')
+        })->whereDate('created_at', Carbon::today())->sum('profit_amount')
         + Sale::whereIn('user_id', $businessUserIds)
             ->whereDate('created_at', Carbon::today())
             ->where('due_amount', 0)

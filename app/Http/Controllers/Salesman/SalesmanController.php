@@ -18,7 +18,7 @@ class SalesmanController extends Controller
         // Calculate today's realized profit (profit from paid sales + profit realizations from due payments)
         $todayRealizedProfit = ProfitRealization::whereIn('sale_id', function($query) {
             $query->select('id')->from('sales')->where('user_id', auth()->id());
-        })->whereDate('created_at', today())->sum('realized_profit')
+        })->whereDate('created_at', today())->sum('profit_amount')
         + Sale::where('user_id', auth()->id())
             ->whereDate('created_at', today())
             ->where('due_amount', 0)
