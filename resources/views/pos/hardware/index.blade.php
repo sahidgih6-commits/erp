@@ -52,7 +52,7 @@
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold text-gray-900">কনফিগার করা ডিভাইস</h2>
             <div class="flex gap-2">
-                <button onclick="scanForDevices()" 
+                <button onclick="scanForDevices(event)" 
                         class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -317,8 +317,8 @@ function testDevice(deviceId) {
 }
 
 // Auto-detect USB/Serial devices
-async function scanForDevices() {
-    const button = event.target.closest('button');
+async function scanForDevices(e) {
+    const button = e.currentTarget;
     const originalText = button.innerHTML;
     button.innerHTML = '<span class="animate-spin">⌛</span> খুঁজছি...';
     button.disabled = true;
@@ -336,7 +336,7 @@ async function scanForDevices() {
         
         // Fallback: Show manual detection info
         if (!('serial' in navigator) && !('usb' in navigator)) {
-            alert('⚠️ আপনার ব্রাউজার স্বয়ংক্রিয় ডিভাইস সনাক্তকরণ সমর্থন করে না।\n\nদয়া করে ম্যানুয়ালি ডিভাইস যোগ করুন।');
+            alert('⚠️ আপনার ব্রাউজার স্বয়ংক্রিয় ডিভাইস সনাক্তকরণ সমর্থন করে না।\n\nChrome/Edge ব্যবহার করুন অথবা ম্যানুয়ালি ডিভাইস যোগ করুন। Firefox বর্তমানে USB/Serial সনাক্ত করতে দেয় না।');
         }
     } catch (error) {
         console.error('Device scan error:', error);
