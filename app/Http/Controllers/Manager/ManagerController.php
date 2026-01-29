@@ -25,6 +25,15 @@ class ManagerController extends Controller
         $todayPaid = Sale::whereIn('user_id', $businessUserIds)->whereDate('created_at', Carbon::today())->sum('paid_amount');
         $todayDue = Sale::whereIn('user_id', $businessUserIds)->whereDate('created_at', Carbon::today())->sum('due_amount');
         
+        // Calculate today's realized profit (profit from paid sales + profit realizations from due payments)
+        $todayRealizedProfit = ProfitRealization::whereIn('sale_id', function($query) use ($businessUserIds) {
+            $query->select('id')->from('sales')->whereIn('user_id', $businessUserIds);
+        })->whereDate('created_at', Carbon::today())->sum('realized_profit')
+        + Sale::whereIn('user_id', $businessUserIds)
+            ->whereDate('created_at', Carbon::today())
+            ->where('due_amount', 0)
+            ->sum('profit');
+        
         // This month's data
         $monthSales = Sale::whereIn('user_id', $businessUserIds)->whereYear('created_at', Carbon::now()->year)
             ->whereMonth('created_at', Carbon::now()->month)
@@ -56,6 +65,7 @@ class ManagerController extends Controller
             'todayProfit',
             'todayPaid',
             'todayDue',
+            'todayRealizedProfit',
             'monthSales',
             'monthProfit',
             'monthPaid',
