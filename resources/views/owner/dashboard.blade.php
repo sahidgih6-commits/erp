@@ -242,6 +242,9 @@
                 <a href="{{ route('owner.managers.index') }}" class="block bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
                     {{ __('dashboard.manager_management') }}
                 </a>
+                <a href="{{ route('owner.salesmen.index') }}" class="block bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
+                    সেলসম্যান ব্যবস্থাপনা
+                </a>
                 <a href="{{ route('owner.products.index') }}" class="block bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center text-sm sm:text-base">
                     {{ __('dashboard.product_management') }}
                 </a>

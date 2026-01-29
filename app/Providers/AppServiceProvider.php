@@ -14,10 +14,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Set locale from session or config
-        if (session()->has('locale')) {
-            app()->setLocale(session('locale'));
+        // Set locale from session or default to Bangla
+        $locale = session('locale', config('app.locale', 'bn'));
+        if (!session()->has('locale')) {
+            session(['locale' => $locale]);
         }
+        app()->setLocale($locale);
 
         if ($this->app->runningInConsole()) {
             return;

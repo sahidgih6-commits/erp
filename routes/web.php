@@ -75,6 +75,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     
     // User Management (Managers, Salesmen, Cashiers)
     Route::resource('users', OwnerUserController::class);
+    Route::resource('salesmen', \App\Http\Controllers\Owner\SalesmanController::class);
     
     // Barcode Printing (POS Feature)
     Route::get('/barcode', [OwnerBarcodeController::class, 'index'])->name('barcode.index');
