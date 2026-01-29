@@ -46,7 +46,7 @@ class BarcodeController extends Controller
             'products' => 'required|array',
             'products.*.id' => 'required|exists:products,id',
             'products.*.quantity' => 'required|integer|min:1',
-            'label_size' => 'required|in:small,medium,large',
+            'label_size' => 'required|in:20x10,30x20,40x30,50x30,60x40,70x50,100x50',
             'include_price' => 'boolean',
             'include_name' => 'boolean',
         ]);
