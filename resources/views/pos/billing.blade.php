@@ -85,20 +85,28 @@
                 <span>{{ __('pos.subtotal') }}:</span>
                 <span class="font-semibold">৳ <span id="subtotal">0.00</span></span>
             </div>
-            <div class="flex justify-between items-center">
-                <span>{{ __('pos.discount') }} (%):</span>
-                <div class="flex items-center gap-2">
-                    <input type="number" 
-                           id="discountInput" 
-                           value="0" 
-                           min="0" 
-                           max="100"
-                           step="0.1" 
-                           onchange="updateTotals()" 
-                           oninput="updateTotals()"
-                           placeholder="%"
-                           class="w-16 px-2 py-1 border border-gray-300 rounded text-xs text-right">
-                    <span class="font-semibold text-xs">৳ <span id="discountAmount">0.00</span></span>
+            <div class="space-y-1">
+                <div class="flex justify-between items-center">
+                    <span>{{ __('pos.discount') }}:</span>
+                    <select id="discountType" onchange="updateTotals()" class="px-2 py-1 border border-gray-300 rounded text-xs">
+                        <option value="percent">শতাংশ (%)</option>
+                        <option value="fixed">টাকা (৳)</option>
+                    </select>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span></span>
+                    <div class="flex items-center gap-2">
+                        <input type="number" 
+                               id="discountInput" 
+                               value="0" 
+                               min="0" 
+                               step="0.1" 
+                               onchange="updateTotals()" 
+                               oninput="updateTotals()"
+                               placeholder="0"
+                               class="w-20 px-2 py-1 border border-gray-300 rounded text-xs text-right">
+                        <span class="font-semibold text-xs text-red-600">-৳ <span id="discountAmount">0.00</span></span>
+                    </div>
                 </div>
             </div>
             <div class="flex justify-between text-gray-400">
@@ -161,6 +169,16 @@
                     {{ __('pos.process_payment') }}
                 </button>
             </div>
+            
+            <!-- Print Last Receipt Button -->
+            <div id="lastReceiptSection" class="hidden">
+                <button onclick="printLastReceipt()" class="w-full px-3 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm font-semibold flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    শেষ রসিদ প্রিন্ট করুন
+                </button>
+            </div>
 
             <!-- Drawer Button (if enabled) -->
             @if($cashDrawer)
@@ -198,6 +216,7 @@
     let cart = [];
     const CSRF = "{{ csrf_token() }}";
     const businessId = "{{ $business->id }}";
+    let lastTransactionId = null;
     
     // Add product to cart
     function addProductToCart(productId, productName, price) {
@@ -279,10 +298,19 @@
     function updateTotals() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const discountInput = document.getElementById('discountInput');
-        const discountPercent = discountInput ? parseFloat(discountInput.value) || 0 : 0;
-        const discount = (subtotal * discountPercent) / 100; // Calculate percentage
+        const discountType = document.getElementById('discountType').value;
+        const discountValue = discountInput ? parseFloat(discountInput.value) || 0 : 0;
+        
+        // Calculate discount based on type
+        let discount = 0;
+        if (discountType === 'percent') {
+            discount = (subtotal * discountValue) / 100;
+        } else {
+            discount = discountValue;
+        }
+        
         const tax = 0; // VAT/Tax disabled
-        const total = subtotal - discount + tax;
+        const total = Math.max(0, subtotal - discount + tax);
         
         document.getElementById('subtotal').textContent = subtotal.toFixed(2);
         document.getElementById('discountAmount').textContent = discount.toFixed(2);
@@ -332,7 +360,8 @@
             items: cart,
             subtotal: parseFloat(document.getElementById('subtotal').textContent),
             discount: parseFloat(document.getElementById('discountAmount').textContent),
-            discount_percent: parseFloat(document.getElementById('discountInput').value) || 0,
+            discount_type: document.getElementById('discountType').value,
+            discount_value: parseFloat(document.getElementById('discountInput').value) || 0,
             tax: parseFloat(document.getElementById('taxAmount').textContent),
             total: total,
             payment_method: document.getElementById('paymentMethod').value,
@@ -367,6 +396,10 @@
     
     // Print receipt and reset
     function printReceiptAndReset(transactionId) {
+        // Save last transaction ID
+        lastTransactionId = transactionId;
+        document.getElementById('lastReceiptSection').classList.remove('hidden');
+        
         // Open receipt in popup window with specific features
         const receiptUrl = '{{ route("pos.receipt.view", "") }}/' + transactionId;
         window.open(receiptUrl, 'POSReceipt', 'width=400,height=700,scrollbars=yes,location=no,menubar=no,toolbar=no');
@@ -390,10 +423,21 @@
         document.getElementById('customerName').value = '';
         document.getElementById('customerPhone').value = '';
         document.getElementById('discountInput').value = '0';
+        document.getElementById('discountType').value = 'percent';
         updateCart();
         
         // Fetch and update summary
         fetchSummary();
+    }
+    
+    // Print last receipt
+    function printLastReceipt() {
+        if (!lastTransactionId) {
+            alert('কোন রসিদ পাওয়া যায়নি');
+            return;
+        }
+        const receiptUrl = '{{ route("pos.receipt.view", "") }}/' + lastTransactionId;
+        window.open(receiptUrl, 'POSReceiptReprint', 'width=400,height=700,scrollbars=yes,location=no,menubar=no,toolbar=no');
     }
     
     // Open cash drawer
