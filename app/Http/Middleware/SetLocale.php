@@ -13,7 +13,12 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = session('locale', config('app.locale', 'bn'));
+        // Set default locale to Bangla if not set in session
+        if (!session()->has('locale')) {
+            session(['locale' => 'bn']);
+        }
+        
+        $locale = session('locale', 'bn');
         app()->setLocale($locale);
 
         return $next($request);
