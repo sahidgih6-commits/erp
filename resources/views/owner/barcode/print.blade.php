@@ -36,12 +36,64 @@
             page-break-inside: avoid;
         }
         
-        /* Small Label: 40x25mm */
-        .label-small {
-            width: 40mm;
-            height: 25mm;
+        /* 20x10mm - Mini */
+        .label-20x10 {
+            width: 20mm;
+            height: 10mm;
         }
-        .label-small .product-name {
+        .label-20x10 .product-name {
+            font-size: 5pt;
+            font-weight: bold;
+            margin-bottom: 0.5mm;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .label-20x10 .barcode-svg {
+            height: 6mm;
+        }
+        .label-20x10 .barcode-text {
+            font-size: 4pt;
+            margin-top: 0.5mm;
+        }
+        .label-20x10 .price {
+            font-size: 5pt;
+            font-weight: bold;
+            margin-top: 0.5mm;
+        }
+        
+        /* 30x20mm - Small */
+        .label-30x20 {
+            width: 30mm;
+            height: 20mm;
+        }
+        .label-30x20 .product-name {
+            font-size: 6pt;
+            font-weight: bold;
+            margin-bottom: 1mm;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .label-30x20 .barcode-svg {
+            height: 8mm;
+        }
+        .label-30x20 .barcode-text {
+            font-size: 5pt;
+            margin-top: 0.5mm;
+        }
+        .label-30x20 .price {
+            font-size: 7pt;
+            font-weight: bold;
+            margin-top: 1mm;
+        }
+        
+        /* 40x30mm - Medium */
+        .label-40x30 {
+            width: 40mm;
+            height: 30mm;
+        }
+        .label-40x30 .product-name {
             font-size: 7pt;
             font-weight: bold;
             margin-bottom: 1mm;
@@ -49,25 +101,25 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .label-small .barcode-svg {
-            height: 10mm;
+        .label-40x30 .barcode-svg {
+            height: 12mm;
         }
-        .label-small .barcode-text {
+        .label-40x30 .barcode-text {
             font-size: 6pt;
             margin-top: 1mm;
         }
-        .label-small .price {
+        .label-40x30 .price {
             font-size: 8pt;
             font-weight: bold;
             margin-top: 1mm;
         }
         
-        /* Medium Label: 50x30mm */
-        .label-medium {
+        /* 50x30mm - Standard */
+        .label-50x30 {
             width: 50mm;
             height: 30mm;
         }
-        .label-medium .product-name {
+        .label-50x30 .product-name {
             font-size: 8pt;
             font-weight: bold;
             margin-bottom: 1mm;
@@ -75,38 +127,84 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .label-medium .barcode-svg {
-            height: 12mm;
+        .label-50x30 .barcode-svg {
+            height: 14mm;
         }
-        .label-medium .barcode-text {
+        .label-50x30 .barcode-text {
             font-size: 7pt;
             margin-top: 1mm;
         }
-        .label-medium .price {
+        .label-50x30 .price {
             font-size: 10pt;
             font-weight: bold;
             margin-top: 1mm;
         }
         
-        /* Large Label: 60x40mm */
-        .label-large {
+        /* 60x40mm - Large */
+        .label-60x40 {
             width: 60mm;
             height: 40mm;
         }
-        .label-large .product-name {
+        .label-60x40 .product-name {
             font-size: 10pt;
             font-weight: bold;
             margin-bottom: 2mm;
         }
-        .label-large .barcode-svg {
-            height: 15mm;
+        .label-60x40 .barcode-svg {
+            height: 18mm;
         }
-        .label-large .barcode-text {
+        .label-60x40 .barcode-text {
             font-size: 8pt;
             margin-top: 1mm;
         }
-        .label-large .price {
+        .label-60x40 .price {
             font-size: 12pt;
+            font-weight: bold;
+            margin-top: 2mm;
+        }
+        
+        /* 70x50mm - Extra Large */
+        .label-70x50 {
+            width: 70mm;
+            height: 50mm;
+        }
+        .label-70x50 .product-name {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 2mm;
+        }
+        .label-70x50 .barcode-svg {
+            height: 22mm;
+        }
+        .label-70x50 .barcode-text {
+            font-size: 10pt;
+            margin-top: 1mm;
+        }
+        .label-70x50 .price {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 2mm;
+        }
+        
+        /* 100x50mm - Wide */
+        .label-100x50 {
+            width: 100mm;
+            height: 50mm;
+        }
+        .label-100x50 .product-name {
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 2mm;
+        }
+        .label-100x50 .barcode-svg {
+            height: 25mm;
+        }
+        .label-100x50 .barcode-text {
+            font-size: 12pt;
+            margin-top: 1mm;
+        }
+        .label-100x50 .price {
+            font-size: 16pt;
             font-weight: bold;
             margin-top: 2mm;
         }

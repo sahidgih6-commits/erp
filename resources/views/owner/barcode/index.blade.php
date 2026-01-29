@@ -9,11 +9,44 @@
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div class="flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">🏷️ {{ __('pos.barcode_printer') ?? 'Barcode Printer' }}</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">🏷️ {{ __('pos.barcode_printer') ?? 'Barcode Sticker Printer' }}</h1>
                     <p class="text-sm text-gray-600 mt-1">{{ __('pos.print_barcode_labels') ?? 'Print barcode labels for your products' }}</p>
                 </div>
                 <a href="{{ route('owner.dashboard') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
                     {{ __('pos.back') }}
+                </a>
+            </div>
+        </div>
+        
+        <!-- Hardware Status -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-blue-100 rounded-lg">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Barcode Printer Status</h3>
+                        @if($barcodePrinter)
+                            <p class="text-sm {{ $barcodePrinter->is_connected ? 'text-green-600' : 'text-red-600' }}">
+                                <span class="inline-block w-2 h-2 {{ $barcodePrinter->is_connected ? 'bg-green-500' : 'bg-red-500' }} rounded-full mr-2"></span>
+                                {{ $barcodePrinter->device_name }} - {{ $barcodePrinter->is_connected ? 'Connected' : 'Disconnected' }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                {{ $barcodePrinter->brand ?? 'Generic' }} {{ $barcodePrinter->model ?? '' }} | {{ $barcodePrinter->connection_type }}
+                            </p>
+                        @else
+                            <p class="text-sm text-gray-500">
+                                <span class="inline-block w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                                No printer configured
+                            </p>
+                        @endif
+                    </div>
+                </div>
+                <a href="{{ route('pos.hardware.index') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                    ⚙️ Configure Hardware
                 </a>
             </div>
         </div>
@@ -98,13 +131,18 @@
                         <!-- Label Size -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('pos.label_size') ?? 'Label Size' }}
+                                {{ __('pos.label_size') ?? 'Sticker Size' }}
                             </label>
                             <select name="label_size" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required>
-                                <option value="small">{{ __('pos.small') ?? 'Small' }} (40x25mm)</option>
-                                <option value="medium" selected>{{ __('pos.medium') ?? 'Medium' }} (50x30mm)</option>
-                                <option value="large">{{ __('pos.large') ?? 'Large' }} (60x40mm)</option>
+                                <option value="20x10">20mm x 10mm (Mini)</option>
+                                <option value="30x20">30mm x 20mm (Small)</option>
+                                <option value="40x30" selected>40mm x 30mm (Medium)</option>
+                                <option value="50x30">50mm x 30mm (Standard)</option>
+                                <option value="60x40">60mm x 40mm (Large)</option>
+                                <option value="70x50">70mm x 50mm (Extra Large)</option>
+                                <option value="100x50">100mm x 50mm (Wide)</option>
                             </select>
+                            <p class="text-xs text-gray-500 mt-1">Standard barcode sticker sizes</p>
                         </div>
 
                         <!-- Include Options -->

@@ -22,13 +22,19 @@ class BarcodeController extends Controller
             return redirect()->route('owner.dashboard')
                 ->with('error', 'Barcode printing is only available when POS system is enabled.');
         }
+        
+        // Get barcode printer hardware if configured
+        $barcodePrinter = $business->hardwareDevices()
+            ->where('device_type', 'thermal_printer')
+            ->where('is_enabled', true)
+            ->first();
 
         $products = $business->products()
             ->select('id', 'name', 'sku', 'barcode', 'sell_price', 'current_stock')
             ->orderBy('name')
             ->get();
 
-        return view('owner.barcode.index', compact('products'));
+        return view('owner.barcode.index', compact('products', 'barcodePrinter', 'systemVersion'));
     }
 
     /**
@@ -85,7 +91,7 @@ class BarcodeController extends Controller
         }
 
         $quantity = $request->input('quantity', 1);
-        $labelSize = $request->input('label_size', 'medium');
+        $labelSize = $request->input('label_size', '50x30');
 
         $selectedProducts = collect([
             [
