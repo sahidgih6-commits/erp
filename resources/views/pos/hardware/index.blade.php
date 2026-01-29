@@ -51,10 +51,31 @@
     <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold text-gray-900">কনফিগার করা ডিভাইস</h2>
-            <button onclick="document.getElementById('addDeviceModal').classList.remove('hidden')" 
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                + নতুন ডিভাইস যোগ করুন
-            </button>
+            <div class="flex gap-2">
+                <button onclick="scanForDevices()" 
+                        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    ডিভাইস খুঁজুন
+                </button>
+                <button onclick="document.getElementById('addDeviceModal').classList.remove('hidden')" 
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                    + নতুন ডিভাইস যোগ করুন
+                </button>
+            </div>
+        </div>
+
+        <!-- Auto-detected Devices -->
+        <div id="detectedDevicesSection" class="hidden mb-6 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-gray-900">🔍 সনাক্ত করা নতুন ডিভাইস</h3>
+                <button onclick="document.getElementById('detectedDevicesSection').classList.add('hidden')" 
+                        class="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+            <div id="detectedDevicesList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Detected devices will be inserted here -->
+            </div>
         </div>
 
         @if($devices->count() > 0)
@@ -292,6 +313,170 @@ function testDevice(deviceId) {
     })
     .catch(error => {
         alert('❌ টেস্ট করতে সমস্যা হয়েছে');
+    });
+}
+
+// Auto-detect USB/Serial devices
+async function scanForDevices() {
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="animate-spin">⌛</span> খুঁজছি...';
+    button.disabled = true;
+    
+    try {
+        // Check for Web Serial API support (Chrome/Edge)
+        if ('serial' in navigator) {
+            await detectSerialDevices();
+        }
+        
+        // Check for Web USB API support
+        if ('usb' in navigator) {
+            await detectUSBDevices();
+        }
+        
+        // Fallback: Show manual detection info
+        if (!('serial' in navigator) && !('usb' in navigator)) {
+            alert('⚠️ আপনার ব্রাউজার স্বয়ংক্রিয় ডিভাইস সনাক্তকরণ সমর্থন করে না।\n\nদয়া করে ম্যানুয়ালি ডিভাইস যোগ করুন।');
+        }
+    } catch (error) {
+        console.error('Device scan error:', error);
+        alert('❌ ডিভাইস খুঁজতে সমস্যা হয়েছে।\n\n' + error.message);
+    } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+}
+
+async function detectSerialDevices() {
+    try {
+        const ports = await navigator.serial.getPorts();
+        
+        if (ports.length === 0) {
+            // Request port selection
+            const port = await navigator.serial.requestPort();
+            if (port) {
+                const info = port.getInfo();
+                addDetectedDevice({
+                    name: 'Serial Device',
+                    port: 'Serial Port',
+                    vendor: info.usbVendorId ? `0x${info.usbVendorId.toString(16)}` : null,
+                    product: info.usbProductId ? `0x${info.usbProductId.toString(16)}` : null
+                });
+            }
+        } else {
+            ports.forEach((port, index) => {
+                const info = port.getInfo();
+                addDetectedDevice({
+                    name: `Serial Device ${index + 1}`,
+                    port: `Serial Port ${index + 1}`,
+                    vendor: info.usbVendorId ? `0x${info.usbVendorId.toString(16)}` : null,
+                    product: info.usbProductId ? `0x${info.usbProductId.toString(16)}` : null
+                });
+            });
+        }
+    } catch (error) {
+        console.log('Serial detection cancelled or failed:', error);
+    }
+}
+
+async function detectUSBDevices() {
+    try {
+        const devices = await navigator.usb.getDevices();
+        
+        if (devices.length === 0) {
+            // Request device selection
+            const device = await navigator.usb.requestDevice({ filters: [] });
+            if (device) {
+                addDetectedDevice({
+                    name: device.productName || 'USB Device',
+                    port: 'USB',
+                    vendor: device.manufacturerName || `VID: ${device.vendorId}`,
+                    product: device.productName || `PID: ${device.productId}`
+                });
+            }
+        } else {
+            devices.forEach(device => {
+                addDetectedDevice({
+                    name: device.productName || 'USB Device',
+                    port: 'USB',
+                    vendor: device.manufacturerName || `VID: ${device.vendorId}`,
+                    product: device.productName || `PID: ${device.productId}`
+                });
+            });
+        }
+    } catch (error) {
+        console.log('USB detection cancelled or failed:', error);
+    }
+}
+
+function addDetectedDevice(deviceInfo) {
+    const section = document.getElementById('detectedDevicesSection');
+    const list = document.getElementById('detectedDevicesList');
+    
+    // Determine device type based on name/vendor
+    let deviceType = 'barcode_scanner';
+    const nameLower = (deviceInfo.name + ' ' + deviceInfo.vendor + ' ' + deviceInfo.product).toLowerCase();
+    
+    if (nameLower.includes('printer') || nameLower.includes('epson') || nameLower.includes('star')) {
+        deviceType = 'thermal_printer';
+    } else if (nameLower.includes('drawer')) {
+        deviceType = 'cash_drawer';
+    }
+    
+    const deviceCard = document.createElement('div');
+    deviceCard.className = 'border border-green-400 bg-white rounded p-3';
+    deviceCard.innerHTML = `
+        <div class="flex justify-between items-start mb-2">
+            <div>
+                <h4 class="font-bold text-sm">${deviceInfo.name}</h4>
+                <p class="text-xs text-gray-600">পোর্ট: ${deviceInfo.port}</p>
+                ${deviceInfo.vendor ? `<p class="text-xs text-gray-600">ব্র্যান্ড: ${deviceInfo.vendor}</p>` : ''}
+            </div>
+            <span class="px-2 py-1 text-xs rounded ${
+                deviceType === 'barcode_scanner' ? 'bg-blue-100 text-blue-800' :
+                deviceType === 'thermal_printer' ? 'bg-purple-100 text-purple-800' :
+                'bg-green-100 text-green-800'
+            }">
+                ${deviceType === 'barcode_scanner' ? 'স্ক্যানার' :
+                  deviceType === 'thermal_printer' ? 'প্রিন্টার' : 'ড্রয়ার'}
+            </span>
+        </div>
+        <button onclick="autoAddDevice('${deviceInfo.name}', '${deviceType}', '${deviceInfo.port}', '${deviceInfo.vendor}', '${deviceInfo.product}')"
+                class="w-full px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+            + এই ডিভাইস যোগ করুন
+        </button>
+    `;
+    
+    list.appendChild(deviceCard);
+    section.classList.remove('hidden');
+}
+
+function autoAddDevice(name, type, port, vendor, product) {
+    fetch('/pos/hardware/auto-add', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            device_name: name,
+            device_type: type,
+            port: port,
+            vendor: vendor,
+            product: product
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ ডিভাইস সফলভাবে যোগ হয়েছে!');
+            location.reload();
+        } else {
+            alert('❌ ডিভাইস যোগ করতে সমস্যা হয়েছে।');
+        }
+    })
+    .catch(error => {
+        alert('❌ সমস্যা হয়েছে: ' + error.message);
     });
 }
 </script>

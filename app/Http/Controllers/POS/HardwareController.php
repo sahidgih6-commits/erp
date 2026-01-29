@@ -130,4 +130,147 @@ class HardwareController extends Controller
         return redirect()->route('pos.hardware.index')
             ->with('success', 'হার্ডওয়্যার ডিভাইস মুছে ফেলা হয়েছে।');
     }
+
+    /**
+     * Detect connected USB/Serial devices.
+     */
+    public function detect(Request $request)
+    {
+        $user = Auth::user();
+        $business = $user->business;
+        
+        // Get device info from request (sent by JavaScript)
+        $detectedDevices = $request->input('devices', []);
+        $results = [];
+        
+        foreach ($detectedDevices as $deviceInfo) {
+            // Check if device already exists
+            $exists = $business->hardwareDevices()
+                ->where('port', $deviceInfo['port'] ?? null)
+                ->where('device_name', $deviceInfo['name'] ?? null)
+                ->exists();
+            
+            if (!$exists) {
+                $results[] = [
+                    'name' => $deviceInfo['name'] ?? 'Unknown Device',
+                    'port' => $deviceInfo['port'] ?? 'USB',
+                    'vendor' => $deviceInfo['vendor'] ?? null,
+                    'product' => $deviceInfo['product'] ?? null,
+                    'type' => $this->detectDeviceType($deviceInfo),
+                    'can_add' => true,
+                ];
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'devices' => $results,
+        ]);
+    }
+
+    /**
+     * Auto-add detected device.
+     */
+    public function autoAdd(Request $request)
+    {
+        $user = Auth::user();
+        $business = $user->business;
+        
+        $request->validate([
+            'device_name' => 'required|string',
+            'device_type' => 'required|in:barcode_scanner,thermal_printer,cash_drawer',
+            'port' => 'nullable|string',
+            'vendor' => 'nullable|string',
+            'product' => 'nullable|string',
+        ]);
+        
+        // Auto-detect brand from vendor/product info
+        $brand = $this->detectBrand($request->vendor, $request->product);
+        
+        $device = $business->hardwareDevices()->create([
+            'device_type' => $request->device_type,
+            'device_name' => $request->device_name,
+            'brand' => $brand,
+            'model' => $request->product ?? 'Auto-detected',
+            'connection_type' => 'USB',
+            'port' => $request->port,
+            'is_enabled' => true,
+            'is_connected' => true,
+            'last_connected_at' => now(),
+            'configured_by' => $user->id,
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Device automatically added',
+            'device' => $device,
+        ]);
+    }
+
+    /**
+     * Detect device type from device info.
+     */
+    private function detectDeviceType($deviceInfo)
+    {
+        $name = strtolower($deviceInfo['name'] ?? '');
+        $vendor = strtolower($deviceInfo['vendor'] ?? '');
+        $product = strtolower($deviceInfo['product'] ?? '');
+        
+        // Check for barcode scanner keywords
+        if (strpos($name, 'scanner') !== false || 
+            strpos($product, 'scanner') !== false ||
+            strpos($name, 'barcode') !== false ||
+            strpos($vendor, 'honeywell') !== false ||
+            strpos($vendor, 'zebra') !== false && strpos($product, 'scanner') !== false) {
+            return 'barcode_scanner';
+        }
+        
+        // Check for printer keywords
+        if (strpos($name, 'printer') !== false || 
+            strpos($product, 'printer') !== false ||
+            strpos($name, 'epson') !== false ||
+            strpos($name, 'star') !== false ||
+            strpos($vendor, 'citizen') !== false) {
+            return 'thermal_printer';
+        }
+        
+        // Check for cash drawer keywords
+        if (strpos($name, 'drawer') !== false || 
+            strpos($product, 'drawer') !== false ||
+            strpos($name, 'apg') !== false) {
+            return 'cash_drawer';
+        }
+        
+        return 'barcode_scanner'; // Default
+    }
+
+    /**
+     * Detect brand from vendor/product info.
+     */
+    private function detectBrand($vendor, $product)
+    {
+        $text = strtolower(($vendor ?? '') . ' ' . ($product ?? ''));
+        
+        $brands = [
+            'Zebra' => ['zebra'],
+            'Honeywell' => ['honeywell'],
+            'Epson' => ['epson', 'seiko'],
+            'Star Micronics' => ['star'],
+            'Citizen' => ['citizen'],
+            'Bixolon' => ['bixolon'],
+            'Datalogic' => ['datalogic'],
+            'Symbol' => ['symbol', 'motorola'],
+            'APG' => ['apg'],
+        ];
+        
+        foreach ($brands as $brand => $keywords) {
+            foreach ($keywords as $keyword) {
+                if (strpos($text, $keyword) !== false) {
+                    return $brand;
+                }
+            }
+        }
+        
+        return 'Generic';
+    }
 }

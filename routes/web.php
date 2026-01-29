@@ -183,6 +183,8 @@ Route::middleware(['auth', 'role:owner|manager|salesman|cashier'])->prefix('pos'
     Route::get('/hardware', [\App\Http\Controllers\POS\HardwareController::class, 'index'])->name('hardware.index');
     Route::get('/hardware/create', [\App\Http\Controllers\POS\HardwareController::class, 'create'])->name('hardware.create');
     Route::post('/hardware', [\App\Http\Controllers\POS\HardwareController::class, 'store'])->name('hardware.store');
+    Route::post('/hardware/detect', [\App\Http\Controllers\POS\HardwareController::class, 'detect'])->name('hardware.detect');
+    Route::post('/hardware/auto-add', [\App\Http\Controllers\POS\HardwareController::class, 'autoAdd'])->name('hardware.auto-add');
     Route::post('/hardware/{device}/test', [\App\Http\Controllers\POS\HardwareController::class, 'test'])->name('hardware.test');
     Route::get('/hardware/{device}/toggle', [\App\Http\Controllers\POS\HardwareController::class, 'toggle'])->name('hardware.toggle');
     Route::delete('/hardware/{device}', [\App\Http\Controllers\POS\HardwareController::class, 'destroy'])->name('hardware.destroy');
