@@ -77,7 +77,7 @@
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
             @if($labelSize == '20x10')
                 width: 20mm;
@@ -107,8 +107,14 @@
                 width: 45mm;
                 height: 35mm;
             @endif
-            margin-left: {{ $offsetX ?? 0 }}mm;
-            margin-top: {{ $offsetY ?? 0 }}mm;
+        }
+        
+        .barcode-content {
+            transform: translate({{ $offsetX ?? 0 }}mm, {{ $offsetY ?? 0 }}mm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .product-name {
@@ -386,6 +392,10 @@
                 flex-direction: column !important;
                 justify-content: center !important;
                 align-items: center !important;
+                overflow: visible !important;
+            }
+            .barcode-content {
+                transform: translate({{ $offsetX ?? 0 }}mm, {{ $offsetY ?? 0 }}mm) !important;
             }
             .barcode-label:last-child {
                 page-break-after: auto;
@@ -439,19 +449,21 @@
         @foreach($products as $item)
             @for($i = 0; $i < $item['quantity']; $i++)
                 <div class="barcode-label label-{{ $labelSize }}">
-                    @if($includeName)
-                        <div class="product-name">{{ Str::limit($item['product']->name, 30) }}</div>
-                    @endif
-                    
-                    <div class="barcode-svg">
-                        <svg class="barcode-{{ $item['product']->id }}-{{ $i }}"></svg>
+                    <div class="barcode-content">
+                        @if($includeName)
+                            <div class="product-name">{{ Str::limit($item['product']->name, 30) }}</div>
+                        @endif
+                        
+                        <div class="barcode-svg">
+                            <svg class="barcode-{{ $item['product']->id }}-{{ $i }}"></svg>
+                        </div>
+                        
+                        <div class="barcode-text">{{ $item['product']->barcode ?? $item['product']->sku ?? sprintf('%08d', $item['product']->id) }}</div>
+                        
+                        @if($includePrice)
+                            <div class="price">৳{{ number_format($item['product']->sell_price, 2) }}</div>
+                        @endif
                     </div>
-                    
-                    <div class="barcode-text">{{ $item['product']->barcode ?? $item['product']->sku ?? sprintf('%08d', $item['product']->id) }}</div>
-                    
-                    @if($includePrice)
-                        <div class="price">৳{{ number_format($item['product']->sell_price, 2) }}</div>
-                    @endif
                 </div>
             @endfor
         @endforeach
@@ -463,15 +475,16 @@
             const labelSize = '{{ $labelSize }}';
             
             // Configure barcode settings based on label size
+            // Increased width for better Netum scanner detection
             const barcodeSettings = {
-                '20x10': { width: 1.5, height: 20, fontSize: 8 },
-                '30x20': { width: 2, height: 30, fontSize: 10 },
-                '40x30': { width: 2.5, height: 40, fontSize: 12 },
-                '45x35': { width: 2.5, height: 48, fontSize: 13 },
-                '50x30': { width: 2.5, height: 45, fontSize: 12 },
-                '60x40': { width: 3, height: 55, fontSize: 14 },
-                '70x50': { width: 3, height: 65, fontSize: 16 },
-                '100x50': { width: 3.5, height: 75, fontSize: 18 }
+                '20x10': { width: 2, height: 20, fontSize: 8, margin: 1 },
+                '30x20': { width: 2.5, height: 30, fontSize: 10, margin: 2 },
+                '40x30': { width: 3, height: 40, fontSize: 12, margin: 2 },
+                '45x35': { width: 3, height: 48, fontSize: 13, margin: 2 },
+                '50x30': { width: 3, height: 45, fontSize: 12, margin: 2 },
+                '60x40': { width: 3.5, height: 55, fontSize: 14, margin: 3 },
+                '70x50': { width: 4, height: 65, fontSize: 16, margin: 3 },
+                '100x50': { width: 4.5, height: 75, fontSize: 18, margin: 4 }
             };
             
             const settings = barcodeSettings[labelSize] || barcodeSettings['45x35'];
@@ -485,17 +498,22 @@
                             width: settings.width,
                             height: settings.height,
                             displayValue: false,
-                            margin: 0,
-                            marginTop: 0,
-                            marginBottom: 0,
-                            marginLeft: 0,
-                            marginRight: 0,
+                            margin: settings.margin,
+                            marginTop: settings.margin,
+                            marginBottom: settings.margin,
+                            marginLeft: settings.margin,
+                            marginRight: settings.margin,
                             fontSize: settings.fontSize,
                             textAlign: "center",
                             textPosition: "bottom",
                             textMargin: 0,
                             background: "#ffffff",
-                            lineColor: "#000000"
+                            lineColor: "#000000",
+                            valid: function(valid) {
+                                if (!valid) {
+                                    console.error('Invalid barcode:', barcodeValue);
+                                }
+                            }
                         });
                     } catch (e) {
                         console.error('Barcode generation error:', e);
