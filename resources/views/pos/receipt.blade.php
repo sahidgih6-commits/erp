@@ -14,46 +14,46 @@
         body {
             font-family: 'Arial', 'Helvetica', sans-serif;
             font-size: {{ $template->receipt_font_size ?? '12px' }};
-            line-height: 1.4;
+            line-height: 1.2;
             color: #000;
             background: #fff;
             width: {{ $template->receipt_paper_size ?? '80mm' }};
             margin: 0 auto;
-            padding: 5mm;
+            padding: 3mm;
         }
         
         .receipt-header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             border-bottom: 2px dashed #000;
-            padding-bottom: 10px;
+            padding-bottom: 5px;
         }
         
         .logo {
-            max-width: 80px;
-            margin: 0 auto 5px;
+            max-width: 60px;
+            margin: 0 auto 3px;
         }
         
         .company-name {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .company-info {
-            font-size: 11px;
-            line-height: 1.3;
+            font-size: 10px;
+            line-height: 1.2;
         }
         
         .header-text {
-            margin-top: 5px;
-            font-size: 11px;
+            margin-top: 3px;
+            font-size: 10px;
             font-style: italic;
         }
         
         .receipt-meta {
-            margin: 10px 0;
-            font-size: 11px;
+            margin: 5px 0;
+            font-size: 10px;
         }
         
         .receipt-meta table {
@@ -61,11 +61,11 @@
         }
         
         .receipt-meta td {
-            padding: 2px 0;
+            padding: 1px 0;
         }
         
         .receipt-items {
-            margin: 10px 0;
+            margin: 5px 0;
             border-top: 1px dashed #000;
             border-bottom: 2px solid #000;
         }
@@ -77,13 +77,13 @@
         
         .receipt-items th {
             text-align: left;
-            padding: 5px 0;
+            padding: 3px 0;
             border-bottom: 1px solid #000;
             font-weight: bold;
         }
         
         .receipt-items td {
-            padding: 3px 0;
+            padding: 2px 0;
         }
         
         .text-right {
@@ -91,7 +91,7 @@
         }
         
         .totals {
-            margin: 10px 0;
+            margin: 5px 0;
         }
         
         .totals table {
@@ -99,33 +99,39 @@
         }
         
         .totals td {
-            padding: 3px 0;
+            padding: 2px 0;
         }
         
         .grand-total {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             border-top: 2px solid #000;
-            padding-top: 5px !important;
+            padding-top: 3px !important;
         }
         
         .payment-info {
-            margin: 10px 0;
+            margin: 5px 0;
             border-top: 1px dashed #000;
-            padding-top: 10px;
+            padding-top: 5px;
         }
         
         .footer {
             text-align: center;
-            margin-top: 15px;
-            font-size: 10px;
+            margin-top: 8px;
+            font-size: 9px;
             border-top: 2px dashed #000;
-            padding-top: 10px;
+            padding-top: 5px;
         }
         
         @media print {
             body {
                 width: {{ $template->receipt_paper_size ?? '80mm' }};
+                margin: 0;
+                padding: 3mm;
+            }
+            @page {
+                margin: 0;
+                size: {{ $template->receipt_paper_size ?? '80mm' }} auto;
             }
         }
     </style>
