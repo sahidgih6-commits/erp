@@ -6,8 +6,8 @@
     <title>Print Barcodes</title>
     <style>
         @page {
-            size: auto;
-            margin: 5mm;
+            margin: 0;
+            padding: 0;
         }
         
         * {
@@ -19,13 +19,14 @@
         body {
             font-family: Arial, sans-serif;
             background: white;
+            margin: 0;
+            padding: 0;
         }
         
         .barcode-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 3mm;
-            padding: 5mm;
+            display: block;
+            margin: 0;
+            padding: 0;
         }
         
         .barcode-label {
@@ -33,7 +34,13 @@
             text-align: center;
             padding: 2mm;
             background: white;
-            page-break-inside: avoid;
+            page-break-after: always;
+            break-after: page;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         /* 20x10mm - Mini */
@@ -217,9 +224,19 @@
         @media print {
             body {
                 background: white;
+                margin: 0;
+                padding: 0;
             }
             .no-print {
                 display: none;
+            }
+            .barcode-label {
+                page-break-after: always;
+                break-after: page;
+            }
+            .barcode-label:last-child {
+                page-break-after: auto;
+                break-after: auto;
             }
         }
         
