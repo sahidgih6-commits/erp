@@ -50,20 +50,24 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .barcode-container {
-            display: block;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
             padding: 0;
-            width: 100%;
         }
         
         .barcode-label {
             border: none;
             text-align: center;
             padding: 0;
-            margin: 0;
+            margin: 0 auto;
             background: white;
             page-break-after: always;
             break-after: page;
@@ -330,16 +334,19 @@
                 display: none !important;
             }
             .barcode-container {
-                margin: 0;
+                margin: 0 auto;
                 padding: 0;
-                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
             .barcode-label {
                 page-break-after: always;
                 break-after: page;
                 page-break-inside: avoid;
                 break-inside: avoid;
-                margin: 0 !important;
+                margin: 0 auto !important;
                 padding: 0 !important;
             }
             .barcode-label:last-child {
