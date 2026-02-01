@@ -10,21 +10,21 @@
             margin: 0;
             padding: 0;
             @if($labelSize == '20x10')
-                size: 20mm 10mm;
+                size: 20mm 10mm portrait;
             @elseif($labelSize == '30x20')
-                size: 30mm 20mm;
+                size: 30mm 20mm portrait;
             @elseif($labelSize == '40x30')
-                size: 40mm 30mm;
+                size: 40mm 30mm portrait;
             @elseif($labelSize == '50x30')
-                size: 50mm 30mm;
+                size: 50mm 30mm portrait;
             @elseif($labelSize == '60x40')
-                size: 60mm 40mm;
+                size: 60mm 40mm portrait;
             @elseif($labelSize == '70x50')
-                size: 70mm 50mm;
+                size: 70mm 50mm portrait;
             @elseif($labelSize == '100x50')
-                size: 100mm 50mm;
+                size: 100mm 50mm portrait;
             @else
-                size: 50mm 30mm;
+                size: 50mm 30mm portrait;
             @endif
         }
         
@@ -32,6 +32,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: white;
         }
         
         body {
@@ -60,6 +66,7 @@
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
+            overflow: hidden;
         }
         
         /* 20x10mm - Mini */
@@ -238,24 +245,52 @@
         .barcode-svg svg {
             width: 100%;
             height: 100%;
+            display: block;
         }
         
         @media print {
-            body {
+            html, body {
                 background: white;
                 margin: 0;
                 padding: 0;
+                width: 100%;
+                height: 100%;
             }
             .no-print {
-                display: none;
+                display: none !important;
+            }
+            .barcode-container {
+                margin: 0;
+                padding: 0;
             }
             .barcode-label {
                 page-break-after: always;
                 break-after: page;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             .barcode-label:last-child {
                 page-break-after: auto;
                 break-after: auto;
+            }
+            
+            /* Ensure proper orientation for thermal printers */
+            @page {
+                @if($labelSize == '20x10')
+                    size: 20mm 10mm portrait;
+                @elseif($labelSize == '30x20')
+                    size: 30mm 20mm portrait;
+                @elseif($labelSize == '40x30')
+                    size: 40mm 30mm portrait;
+                @elseif($labelSize == '50x30')
+                    size: 50mm 30mm portrait;
+                @elseif($labelSize == '60x40')
+                    size: 60mm 40mm portrait;
+                @elseif($labelSize == '70x50')
+                    size: 70mm 50mm portrait;
+                @elseif($labelSize == '100x50')
+                    size: 100mm 50mm portrait;
+                @endif
             }
         }
         
@@ -326,16 +361,41 @@
     <script>
         // Generate barcodes using JsBarcode
         document.addEventListener('DOMContentLoaded', function() {
+            const labelSize = '{{ $labelSize }}';
+            
+            // Configure barcode settings based on label size
+            const barcodeSettings = {
+                '20x10': { width: 1, height: 15, fontSize: 8 },
+                '30x20': { width: 1.5, height: 25, fontSize: 10 },
+                '40x30': { width: 2, height: 35, fontSize: 12 },
+                '50x30': { width: 2, height: 40, fontSize: 12 },
+                '60x40': { width: 2.5, height: 50, fontSize: 14 },
+                '70x50': { width: 2.5, height: 60, fontSize: 16 },
+                '100x50': { width: 3, height: 70, fontSize: 18 }
+            };
+            
+            const settings = barcodeSettings[labelSize] || barcodeSettings['50x30'];
+            
             @foreach($products as $item)
                 @for($i = 0; $i < $item['quantity']; $i++)
                     try {
                         const barcodeValue = '{{ $item['product']->barcode ?? $item['product']->sku ?? sprintf('%08d', $item['product']->id) }}';
                         JsBarcode(".barcode-{{ $item['product']->id }}-{{ $i }}", barcodeValue, {
                             format: "CODE128",
-                            width: 2,
-                            height: 40,
+                            width: settings.width,
+                            height: settings.height,
                             displayValue: false,
-                            margin: 2
+                            margin: 0,
+                            marginTop: 0,
+                            marginBottom: 0,
+                            marginLeft: 2,
+                            marginRight: 2,
+                            fontSize: settings.fontSize,
+                            textAlign: "center",
+                            textPosition: "bottom",
+                            textMargin: 1,
+                            background: "#ffffff",
+                            lineColor: "#000000"
                         });
                     } catch (e) {
                         console.error('Barcode generation error:', e);
@@ -346,7 +406,7 @@
             // Auto-print dialog after barcodes are generated
             setTimeout(function() {
                 window.print();
-            }, 500);
+            }, 800);
         });
     </script>
 </body>
