@@ -11,6 +11,10 @@
             box-sizing: border-box;
         }
         
+        html {
+            height: auto;
+        }
+        
         body {
             font-family: 'Arial', 'Helvetica', sans-serif;
             font-size: {{ $template->receipt_font_size ?? '12px' }};
@@ -18,8 +22,12 @@
             color: #000;
             background: #fff;
             width: {{ $template->receipt_paper_size ?? '80mm' }};
+            max-width: {{ $template->receipt_paper_size ?? '80mm' }};
+            height: auto;
+            min-height: auto;
             margin: 0;
-            padding: 2mm;
+            padding: 2mm 2mm 3mm 2mm;
+            page-break-after: avoid;
         }
         
         .receipt-header {
@@ -130,22 +138,30 @@
             border-top: 2px dashed #000;
             padding-top: 3px;
             margin-bottom: 0;
+            padding-bottom: 0;
+            page-break-after: avoid;
         }
         
         @media print {
-            html, body {
+            html {
                 height: auto;
-                margin: 0;
-                padding: 0;
             }
             body {
                 width: {{ $template->receipt_paper_size ?? '80mm' }};
-                padding: 2mm;
+                max-width: {{ $template->receipt_paper_size ?? '80mm' }};
+                padding: 2mm 2mm 3mm 2mm;
+                margin: 0;
+                height: auto;
+                min-height: auto;
+                page-break-after: avoid;
             }
             @page {
                 margin: 0;
                 padding: 0;
                 size: {{ $template->receipt_paper_size ?? '80mm' }} auto;
+            }
+            .footer {
+                page-break-after: avoid;
             }
         }
     </style>
@@ -282,6 +298,13 @@
     </div>
     
     <script>
+        // Remove any blank space after content
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set body height to actual content height
+            document.body.style.height = 'auto';
+            document.documentElement.style.height = 'auto';
+        });
+        
         // Auto-print when page loads
         window.onload = function() {
             setTimeout(function() {
