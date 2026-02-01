@@ -5,31 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print Barcodes</title>
     <style>
-        /* Page size matching sticker dimensions plus gap */
+        /* Page size matching sticker dimensions */
         @page {
             margin: 0mm;
             padding: 0mm;
-            @php
-                $gap = $stickerGap ?? 0;
-            @endphp
             @if($labelSize == '20x10')
-                size: 20mm {{ 10 + $gap }}mm portrait;
+                size: 20mm 10mm portrait;
             @elseif($labelSize == '30x20')
-                size: 30mm {{ 20 + $gap }}mm portrait;
+                size: 30mm 20mm portrait;
             @elseif($labelSize == '40x30')
-                size: 40mm {{ 30 + $gap }}mm portrait;
+                size: 40mm 30mm portrait;
             @elseif($labelSize == '45x35')
-                size: 45mm {{ 35 + $gap }}mm portrait;
+                size: 45mm 35mm portrait;
             @elseif($labelSize == '50x30')
-                size: 50mm {{ 30 + $gap }}mm portrait;
+                size: 50mm 30mm portrait;
             @elseif($labelSize == '60x40')
-                size: 60mm {{ 40 + $gap }}mm portrait;
+                size: 60mm 40mm portrait;
             @elseif($labelSize == '70x50')
-                size: 70mm {{ 50 + $gap }}mm portrait;
+                size: 70mm 50mm portrait;
             @elseif($labelSize == '100x50')
-                size: 100mm {{ 50 + $gap }}mm portrait;
+                size: 100mm 50mm portrait;
             @else
-                size: 45mm {{ 35 + $gap }}mm portrait;
+                size: 45mm 35mm portrait;
             @endif
         }
         
@@ -72,7 +69,6 @@
             border: none;
             text-align: center;
             padding: 0;
-            padding-bottom: {{ $stickerGap ?? 0 }}mm;
             background: white;
             page-break-after: always;
             break-after: page;
@@ -392,7 +388,6 @@
                 break-inside: avoid;
                 margin: 0mm !important;
                 padding: 0mm !important;
-                padding-bottom: {{ $stickerGap ?? 0 }}mm !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
