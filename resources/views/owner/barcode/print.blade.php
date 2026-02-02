@@ -21,8 +21,8 @@
         html {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            width: 45mm;
+            height: 35mm;
         }
         
         body {
@@ -30,8 +30,8 @@
             background: white;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
+            width: 45mm;
+            height: 35mm;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -45,6 +45,7 @@
             justify-content: center;
             margin: 0 auto;
             padding: 0;
+            width: 45mm;
         }
         
         .barcode-label {
@@ -61,34 +62,8 @@
             box-sizing: border-box;
             overflow: visible;
             position: relative;
-            @if($labelSize == '20x10')
-                width: 20mm;
-                height: 10mm;
-            @elseif($labelSize == '30x20')
-                width: 30mm;
-                height: 20mm;
-            @elseif($labelSize == '40x30')
-                width: 40mm;
-                height: 30mm;
-            @elseif($labelSize == '45x35')
-                width: 45mm;
-                height: 35mm;
-            @elseif($labelSize == '50x30')
-                width: 50mm;
-                height: 30mm;
-            @elseif($labelSize == '60x40')
-                width: 60mm;
-                height: 40mm;
-            @elseif($labelSize == '70x50')
-                width: 70mm;
-                height: 50mm;
-            @elseif($labelSize == '100x50')
-                width: 100mm;
-                height: 50mm;
-            @else
-                width: 45mm;
-                height: 35mm;
-            @endif
+            width: 45mm;
+            height: 35mm;
         }
         
         .barcode-content {
