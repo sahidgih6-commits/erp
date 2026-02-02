@@ -319,6 +319,66 @@
             display: block;
         }
         
+        .paper-size-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 999;
+            max-width: 450px;
+            font-size: 14px;
+            line-height: 1.6;
+            border: 3px solid white;
+        }
+        
+        .paper-size-warning strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .paper-size-warning code {
+            background: rgba(255,255,255,0.25);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 16px;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .paper-size-warning ol {
+            margin: 15px 0 15px 20px;
+            text-align: left;
+        }
+        
+        .paper-size-warning li {
+            margin: 8px 0;
+        }
+        
+        .paper-size-warning button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        .paper-size-warning button:hover {
+            background: #f0f0f0;
+        }
+        
         @media print {
             @page {
                 margin: 0mm;
@@ -453,6 +513,22 @@
     <div class="print-controls no-print">
         <button class="btn-print" onclick="window.print()">🖨️ Print Labels</button>
         <button class="btn-close" onclick="window.close()">✖ Close</button>
+    </div>
+
+    <div class="paper-size-warning no-print" id="sizeWarning">
+        <strong>⚠️ IMPORTANT: Set Paper Size</strong>
+        <div style="text-align: center; margin: 15px 0;">
+            Required size: <code>45mm × 35mm</code>
+        </div>
+        <ol>
+            <li>Press <strong>Ctrl+P</strong> to open print dialog</li>
+            <li>Click <strong>"More settings"</strong></li>
+            <li>Under <strong>"Paper size"</strong>, select your Rongta 45×35mm option</li>
+            <li>If not available, configure custom size in printer properties</li>
+        </ol>
+        <button onclick="document.getElementById('sizeWarning').style.display='none'; window.print();">
+            Got it! Open Print Dialog
+        </button>
     </div>
 
     <div class="barcode-container">
