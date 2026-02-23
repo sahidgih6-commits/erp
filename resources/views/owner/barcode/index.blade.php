@@ -135,144 +135,245 @@
 
                 <!-- Settings & Preview -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                        <h2 class="text-lg font-semibold mb-4">{{ __('pos.print_settings') ?? 'Print Settings' }}</h2>
-                        
-                        <!-- Label Size -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                {{ __('pos.label_size') ?? 'Sticker Size' }}
-                            </label>
-                            <select name="label_size" id="labelSizeSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg" required onchange="updateSizePreview()">
-                                <option value="20x10" data-width="20" data-height="10">20mm × 10mm - Mini (Very Small Items)</option>
-                                <option value="30x20" data-width="30" data-height="20">30mm × 20mm - Small (Small Products)</option>
-                                <option value="40x30" data-width="40" data-height="30">40mm × 30mm - Medium (Standard Retail)</option>
-                                <option value="45x35" data-width="45" data-height="35" selected>45mm × 35mm - Your Size (Custom)</option>
-                                <option value="50x30" data-width="50" data-height="30">50mm × 30mm - Standard (Most Products)</option>
-                                <option value="60x40" data-width="60" data-height="40">60mm × 40mm - Large (Larger Items)</option>
-                                <option value="70x50" data-width="70" data-height="50">70mm × 50mm - XL (Large Products)</option>
-                                <option value="100x50" data-width="100" data-height="50">100mm × 50mm - Wide (Wide Labels)</option>
-                            </select>
-                            <div id="sizePreview" class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                                <strong>📏 Selected Size:</strong> <span id="sizeInfo">45mm × 35mm</span><br>
-                                <span class="text-gray-600">Ensure your Rongta printer has this size sticker loaded</span>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1">⚠️ Match with your actual sticker paper size</p>
-```                        </div>
-                        <!-- Print Position Adjustment -->
-                        <div class="mb-4 border border-gray-300 rounded-lg p-4 bg-gray-50">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                🎯 Print Position Adjustment
-                            </label>
-                            
-                            <!-- Horizontal Position -->
-                            <div class="mb-3">
-                                <label class="block text-xs text-gray-600 mb-1">Horizontal Position:</label>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="adjustPosition('h', -1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        ← Left
-                                    </button>
-                                    <button type="button" onclick="adjustPosition('h', 0)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        ⊙ Center
-                                    </button>
-                                    <button type="button" onclick="adjustPosition('h', 1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        Right →
-                                    </button>
-                                </div>
-                                <input type="hidden" name="offset_x" id="offsetX" value="0">
-                                <div class="text-xs text-center mt-1 text-gray-500">Offset: <span id="offsetXDisplay">0mm</span></div>
-                            </div>
-                            
-                            <!-- Vertical Position -->
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">Vertical Position:</label>
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="adjustPosition('v', -1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        ↑ Up
-                                    </button>
-                                    <button type="button" onclick="adjustPosition('v', 0)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        ⊙ Center
-                                    </button>
-                                    <button type="button" onclick="adjustPosition('v', 1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                        Down ↓
-                                    </button>
-                                </div>
-                                <input type="hidden" name="offset_y" id="offsetY" value="0">
-                                <div class="text-xs text-center mt-1 text-gray-500">Offset: <span id="offsetYDisplay">0mm</span></div>
-                            </div>
-                            
-                            <button type="button" onclick="resetPosition()" class="w-full mt-3 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200">
-                                Reset to Center
-                            </button>
-                        </div>
+                  <div class="sticky top-4 space-y-4">
 
-                        <!-- Gap Between Stickers -->
-                        <div class="mb-4 border border-blue-300 rounded-lg p-4 bg-blue-50">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                📏 Gap Between Stickers
-                            </label>
-                            
-                            <div class="flex gap-2 mb-2">
-                                <button type="button" onclick="adjustGap(-1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                    ➖ Less Gap
-                                </button>
-                                <button type="button" onclick="adjustGap(0)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                    ⊙ No Gap
-                                </button>
-                                <button type="button" onclick="adjustGap(1)" class="flex-1 px-3 py-2 bg-white border border-gray-300 rounded hover:bg-gray-100 text-sm">
-                                    ➕ More Gap
-                                </button>
-                            </div>
-                            
-                            <input type="hidden" name="sticker_gap" id="stickerGap" value="0">
-                            <div class="text-xs text-center text-gray-600">
-                                Current Gap: <span id="gapDisplay" class="font-semibold">0mm</span>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">⬆ More Gap = content shifts UP on label &nbsp;|&nbsp; ⬇ Less Gap = shifts DOWN</p>
-                        </div>
-                        
-                        <!-- Include Options -->
-                        <div class="mb-4 space-y-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="include_name" value="1" checked class="w-4 h-4 text-blue-600 mr-2">
-                                <span class="text-sm text-gray-700">{{ __('pos.include_product_name') ?? 'Include Product Name' }}</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="checkbox" name="include_price" value="1" checked class="w-4 h-4 text-blue-600 mr-2">
-                                <span class="text-sm text-gray-700">{{ __('pos.include_price') ?? 'Include Price' }}</span>
-                            </label>
-                        </div>
-
-                        <!-- Selected Products Summary -->
-                        <div class="bg-blue-50 rounded-lg p-4 mb-4">
-                            <p class="text-sm text-gray-600">{{ __('pos.selected_products') ?? 'Selected Products' }}:</p>
-                            <p class="text-2xl font-bold text-blue-600"><span id="selectedCount">0</span></p>
-                            <p class="text-xs text-gray-500 mt-1">{{ __('pos.total_labels') ?? 'Total Labels' }}: <span id="totalLabels">0</span></p>
-                        </div>
-
-                        <!-- Hidden inputs for selected products -->
-                        <div id="selectedProducts"></div>
-
-                        <!-- Action Buttons -->
-                        <button type="submit" 
-                                id="printButton"
-                                class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled>
-                            🖨️ {{ __('pos.generate_print') ?? 'Generate & Print' }}
-                        </button>
-
-                        <button type="button" 
-                                onclick="selectAll()"
-                                class="w-full mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
-                            {{ __('pos.select_all') ?? 'Select All' }}
-                        </button>
-
-                        <button type="button" 
-                                onclick="clearSelection()"
-                                class="w-full mt-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
-                            {{ __('pos.clear_selection') ?? 'Clear Selection' }}
-                        </button>
+                    <!-- ── STICKER SIZE ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Sticker Size</p>
+                      <select name="label_size" id="labelSizeSelect"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500"
+                              required onchange="rebuildCanvas()">
+                        <option value="20x10"  data-width="20"  data-height="10">20 × 10 mm — Mini</option>
+                        <option value="30x20"  data-width="30"  data-height="20">30 × 20 mm — Small</option>
+                        <option value="40x30"  data-width="40"  data-height="30">40 × 30 mm — Medium</option>
+                        <option value="45x35"  data-width="45"  data-height="35" selected>45 × 35 mm — Custom</option>
+                        <option value="50x30"  data-width="50"  data-height="30">50 × 30 mm — Standard</option>
+                        <option value="60x40"  data-width="60"  data-height="40">60 × 40 mm — Large</option>
+                        <option value="70x50"  data-width="70"  data-height="50">70 × 50 mm — XL</option>
+                        <option value="100x50" data-width="100" data-height="50">100 × 50 mm — Wide</option>
+                      </select>
+                      <div class="mt-2 flex items-center gap-2 text-xs text-blue-700 bg-blue-50 rounded-lg px-3 py-2">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
+                        <span>Selected: <strong id="sizeInfo">45mm × 35mm</strong> — ensure roll matches</span>
+                      </div>
                     </div>
+
+                    <!-- ── LIVE CANVAS EDITOR ── -->
+                    <div class="bg-gray-900 rounded-2xl shadow-xl p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Live Preview  <span class="text-gray-600 normal-case font-normal">— drag content to reposition</span></p>
+                      <p class="text-xs text-gray-500 mb-3">Blue border = sticker edge &nbsp;·&nbsp; Gray band = gap zone &nbsp;·&nbsp; Grid = 5mm</p>
+
+                      <!-- Canvas wrapper: centered -->
+                      <div class="flex justify-center">
+                        <div id="canvasWrap" class="relative select-none" style="width:240px;">
+
+                          <!-- Sticker area -->
+                          <div id="stickerArea"
+                               class="relative overflow-hidden bg-white"
+                               style="border:2px solid #3b82f6; border-radius:4px; cursor:crosshair;">
+
+                            <!-- Grid overlay -->
+                            <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none" style="opacity:.3;"></canvas>
+
+                            <!-- Draggable content block -->
+                            <div id="dragContent"
+                                 class="absolute flex flex-col items-center justify-center pointer-events-auto"
+                                 style="cursor:grab; user-select:none; padding:2px;">
+                              <div id="prev-name"  class="font-bold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis" style="font-size:9px; max-width:100%;">Product Name</div>
+                              <!-- barcode bars (SVG placeholder) -->
+                              <svg id="prev-barcode" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" style="display:block;margin:1px auto;">
+                                <rect x="0"  width="3" height="40" fill="#000"/>
+                                <rect x="5"  width="2" height="40" fill="#000"/>
+                                <rect x="9"  width="4" height="40" fill="#000"/>
+                                <rect x="15" width="1" height="40" fill="#000"/>
+                                <rect x="18" width="3" height="40" fill="#000"/>
+                                <rect x="23" width="2" height="40" fill="#000"/>
+                                <rect x="27" width="4" height="40" fill="#000"/>
+                                <rect x="33" width="1" height="40" fill="#000"/>
+                                <rect x="36" width="2" height="40" fill="#000"/>
+                                <rect x="40" width="3" height="40" fill="#000"/>
+                                <rect x="45" width="1" height="40" fill="#000"/>
+                                <rect x="48" width="4" height="40" fill="#000"/>
+                                <rect x="54" width="2" height="40" fill="#000"/>
+                                <rect x="58" width="3" height="40" fill="#000"/>
+                                <rect x="63" width="1" height="40" fill="#000"/>
+                                <rect x="66" width="2" height="40" fill="#000"/>
+                                <rect x="70" width="4" height="40" fill="#000"/>
+                                <rect x="76" width="1" height="40" fill="#000"/>
+                                <rect x="79" width="3" height="40" fill="#000"/>
+                                <rect x="84" width="2" height="40" fill="#000"/>
+                                <rect x="88" width="1" height="40" fill="#000"/>
+                                <rect x="91" width="4" height="40" fill="#000"/>
+                                <rect x="97" width="2" height="40" fill="#000"/>
+                                <rect x="101" width="3" height="40" fill="#000"/>
+                                <rect x="106" width="1" height="40" fill="#000"/>
+                                <rect x="109" width="2" height="40" fill="#000"/>
+                                <rect x="113" width="4" height="40" fill="#000"/>
+                                <rect x="119" width="1" height="40" fill="#000"/>
+                              </svg>
+                              <div id="prev-code"  class="text-gray-600"   style="font-size:7px;">0000000000</div>
+                              <div id="prev-price" class="font-bold text-gray-900" style="font-size:9px;">৳0.00</div>
+                            </div>
+
+                            <!-- Crosshair center mark -->
+                            <div class="absolute pointer-events-none" id="centerMark"
+                                 style="top:50%;left:50%;transform:translate(-50%,-50%);opacity:.25;">
+                              <div style="width:1px;height:100%;background:#3b82f6;position:absolute;left:50%;top:0;"></div>
+                              <div style="height:1px;width:100%;background:#3b82f6;position:absolute;top:50%;left:0;"></div>
+                            </div>
+                          </div>
+
+                          <!-- Gap zone -->
+                          <div id="gapZone"
+                               style="background:repeating-linear-gradient(45deg,#374151 0,#374151 3px,transparent 3px,transparent 10px);
+                                      border:1px dashed #4b5563; border-top:none; border-radius:0 0 4px 4px; height:0px; overflow:hidden; transition:height .2s;">
+                            <div class="flex items-center justify-center h-full">
+                              <span class="text-gray-400" style="font-size:9px;" id="gapLabel">gap: 0mm</span>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <!-- Offset readout badges -->
+                      <div class="flex justify-center gap-3 mt-3">
+                        <div class="flex items-center gap-1 bg-gray-800 rounded-lg px-3 py-1">
+                          <span class="text-gray-400 text-xs">X</span>
+                          <span id="offsetXDisplay" class="text-white font-mono text-xs font-bold">0mm</span>
+                        </div>
+                        <div class="flex items-center gap-1 bg-gray-800 rounded-lg px-3 py-1">
+                          <span class="text-gray-400 text-xs">Y</span>
+                          <span id="offsetYDisplay" class="text-white font-mono text-xs font-bold">0mm</span>
+                        </div>
+                        <div class="flex items-center gap-1 bg-gray-800 rounded-lg px-3 py-1">
+                          <span class="text-gray-400 text-xs">Gap</span>
+                          <span id="gapDisplay" class="text-yellow-400 font-mono text-xs font-bold">0mm</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- ── POSITION FINE-TUNE ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Position Fine-Tune</p>
+
+                      <!-- D-Pad -->
+                      <div class="grid grid-cols-3 gap-1.5 w-36 mx-auto mb-4">
+                        <div></div>
+                        <button type="button" onclick="nudge(0,-1)"
+                          class="aspect-square rounded-xl bg-gray-100 hover:bg-blue-100 active:bg-blue-200 flex items-center justify-center text-gray-700 font-bold text-lg transition">▲</button>
+                        <div></div>
+                        <button type="button" onclick="nudge(-1,0)"
+                          class="aspect-square rounded-xl bg-gray-100 hover:bg-blue-100 active:bg-blue-200 flex items-center justify-center text-gray-700 font-bold text-lg transition">◀</button>
+                        <button type="button" onclick="resetPosition()"
+                          class="aspect-square rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 flex items-center justify-center text-red-500 font-bold transition"
+                          title="Reset to center">⊙</button>
+                        <button type="button" onclick="nudge(1,0)"
+                          class="aspect-square rounded-xl bg-gray-100 hover:bg-blue-100 active:bg-blue-200 flex items-center justify-center text-gray-700 font-bold text-lg transition">▶</button>
+                        <div></div>
+                        <button type="button" onclick="nudge(0,1)"
+                          class="aspect-square rounded-xl bg-gray-100 hover:bg-blue-100 active:bg-blue-200 flex items-center justify-center text-gray-700 font-bold text-lg transition">▼</button>
+                        <div></div>
+                      </div>
+
+                      <!-- Step size selector -->
+                      <div class="flex items-center justify-center gap-2">
+                        <span class="text-xs text-gray-500">Step:</span>
+                        <div class="flex gap-1">
+                          <button type="button" onclick="setStep(0.5)"  id="step-0.5" class="step-btn px-2 py-1 rounded-lg border text-xs font-mono transition">0.5</button>
+                          <button type="button" onclick="setStep(1)"    id="step-1"   class="step-btn px-2 py-1 rounded-lg border text-xs font-mono transition active">1</button>
+                          <button type="button" onclick="setStep(2)"    id="step-2"   class="step-btn px-2 py-1 rounded-lg border text-xs font-mono transition">2</button>
+                          <button type="button" onclick="setStep(5)"    id="step-5"   class="step-btn px-2 py-1 rounded-lg border text-xs font-mono transition">5</button>
+                        </div>
+                        <span class="text-xs text-gray-500">mm</span>
+                      </div>
+
+                      <input type="hidden" name="offset_x" id="offsetX" value="0">
+                      <input type="hidden" name="offset_y" id="offsetY" value="0">
+                    </div>
+
+                    <!-- ── GAP BETWEEN STICKERS ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Gap Between Stickers</p>
+                      <p class="text-xs text-gray-500 mb-3">Positive = content shifts UP on label to compensate printer over-advance</p>
+
+                      <div class="flex items-center gap-3">
+                        <button type="button" onclick="nudgeGap(-1)"
+                          class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-red-100 text-gray-700 text-xl font-bold flex items-center justify-center transition">−</button>
+
+                        <div class="flex-1">
+                          <input type="range" id="gapSlider" min="-10" max="10" step="1" value="0"
+                                 class="w-full accent-yellow-500"
+                                 oninput="setGap(parseInt(this.value))">
+                          <div class="flex justify-between text-xs text-gray-400 mt-0.5">
+                            <span>-10mm</span><span>0</span><span>+10mm</span>
+                          </div>
+                        </div>
+
+                        <button type="button" onclick="nudgeGap(1)"
+                          class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-green-100 text-gray-700 text-xl font-bold flex items-center justify-center transition">+</button>
+                      </div>
+
+                      <button type="button" onclick="setGap(0)"
+                        class="mt-3 w-full py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs text-gray-600 font-medium transition">Reset Gap to 0</button>
+
+                      <input type="hidden" name="sticker_gap" id="stickerGap" value="0">
+                    </div>
+
+                    <!-- ── INCLUDE OPTIONS ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Content Options</p>
+                      <label class="flex items-center gap-3 cursor-pointer group mb-3">
+                        <div class="relative">
+                          <input type="checkbox" name="include_name" id="includeName" value="1" checked class="sr-only peer">
+                          <div class="w-10 h-6 bg-gray-200 peer-checked:bg-blue-600 rounded-full transition"></div>
+                          <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-4 transition"></div>
+                        </div>
+                        <span class="text-sm text-gray-700">Include Product Name</span>
+                      </label>
+                      <label class="flex items-center gap-3 cursor-pointer group">
+                        <div class="relative">
+                          <input type="checkbox" name="include_price" id="includePrice" value="1" checked class="sr-only peer">
+                          <div class="w-10 h-6 bg-gray-200 peer-checked:bg-blue-600 rounded-full transition"></div>
+                          <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow peer-checked:translate-x-4 transition"></div>
+                        </div>
+                        <span class="text-sm text-gray-700">Include Price</span>
+                      </label>
+                    </div>
+
+                    <!-- ── SUMMARY + ACTIONS ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <div class="flex items-center justify-between mb-4">
+                        <div>
+                          <p class="text-xs text-gray-500">{{ __('pos.selected_products') ?? 'Products' }}</p>
+                          <p class="text-3xl font-black text-blue-600"><span id="selectedCount">0</span></p>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-xs text-gray-500">Total Labels</p>
+                          <p class="text-3xl font-black text-gray-800"><span id="totalLabels">0</span></p>
+                        </div>
+                      </div>
+
+                      <div id="selectedProducts"></div>
+
+                      <button type="submit" id="printButton"
+                              class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-200 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm"
+                              disabled>
+                        🖨️ {{ __('pos.generate_print') ?? 'Generate & Print' }}
+                      </button>
+
+                      <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button type="button" onclick="selectAll()"
+                          class="py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium rounded-xl text-sm transition">
+                          ✅ Select All
+                        </button>
+                        <button type="button" onclick="clearSelection()"
+                          class="py-2 bg-red-50 hover:bg-red-100 text-red-600 font-medium rounded-xl text-sm transition">
+                          ✕ Clear
+                        </button>
+                      </div>
+                    </div>
+
+                  </div><!-- /sticky -->
                 </div>
             </div>
         </form>
@@ -280,179 +381,329 @@
 </div>
 
 <script>
-    // Product search functionality
-    document.getElementById('productSearch').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const products = document.querySelectorAll('.product-item');
-        
-        products.forEach(product => {
-            const name = product.dataset.name;
-            const sku = product.dataset.sku;
-            const barcode = product.dataset.barcode;
-            
-            if (name.includes(searchTerm) || sku.includes(searchTerm) || barcode.includes(searchTerm)) {
-                product.classList.remove('hidden');
-            } else {
-                product.classList.add('hidden');
-            }
-        });
-    });
+    /* ─── State ─────────────────────────────────────── */
+    let offsetX  = 0, offsetY  = 0, gap = 0, stepMm = 1;
+    let labelWmm = 45, labelHmm = 35;
+    const CANVAS_W = 236; // fixed canvas pixel width
 
-    // Enable/disable quantity input based on checkbox
-    document.querySelectorAll('.product-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const productId = this.dataset.productId;
-            const quantityInput = document.querySelector(`input.quantity-input[data-product-id="${productId}"]`);
-            quantityInput.disabled = !this.checked;
-            updateSelection();
-        });
-    });
+    /* ─── Canvas builders ────────────────────────────── */
+    function getScale() { return CANVAS_W / labelWmm; }
 
-    // Update selection summary
-    function updateSelection() {
-        const checkboxes = document.querySelectorAll('.product-checkbox:checked');
-        let totalLabels = 0;
-        
-        const selectedProductsDiv = document.getElementById('selectedProducts');
-        selectedProductsDiv.innerHTML = '';
-        
-        checkboxes.forEach((checkbox, index) => {
-            const productId = checkbox.dataset.productId;
-            const quantityInput = document.querySelector(`input.quantity-input[data-product-id="${productId}"]`);
-            const quantity = parseInt(quantityInput.value) || 1;
-            totalLabels += quantity;
-            
-            // Add hidden inputs
-            selectedProductsDiv.innerHTML += `
-                <input type="hidden" name="products[${index}][id]" value="${productId}">
-                <input type="hidden" name="products[${index}][quantity]" value="${quantity}">
-            `;
-        });
-        
-        document.getElementById('selectedCount').textContent = checkboxes.length;
-        document.getElementById('totalLabels').textContent = totalLabels;
-        document.getElementById('printButton').disabled = checkboxes.length === 0;
+    function rebuildCanvas() {
+        const sel = document.getElementById('labelSizeSelect');
+        const opt = sel.options[sel.selectedIndex];
+        labelWmm = parseFloat(opt.dataset.width);
+        labelHmm = parseFloat(opt.dataset.height);
+        document.getElementById('sizeInfo').textContent = labelWmm + 'mm × ' + labelHmm + 'mm';
+
+        const scale  = getScale();
+        const sH     = Math.round(labelHmm * scale);
+
+        const area = document.getElementById('stickerArea');
+        area.style.width  = CANVAS_W + 'px';
+        area.style.height = sH + 'px';
+
+        const wrap = document.getElementById('canvasWrap');
+        wrap.style.width = CANVAS_W + 'px';
+
+        // center mark
+        const cm = document.getElementById('centerMark');
+        cm.style.width  = CANVAS_W + 'px';
+        cm.style.height = sH + 'px';
+
+        // draw grid
+        drawGrid(scale, sH);
+        // place content
+        placeContent();
+        // apply gap zone
+        applyGapZone();
     }
 
-    // Quantity input change
-    document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('change', updateSelection);
-    });
-
-    // Select all
-    function selectAll() {
-        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
-            if (!checkbox.closest('.product-item').classList.contains('hidden')) {
-                checkbox.checked = true;
-                const productId = checkbox.dataset.productId;
-                const quantityInput = document.querySelector(`input.quantity-input[data-product-id="${productId}"]`);
-                quantityInput.disabled = false;
-            }
-        });
-        updateSelection();
-    }
-
-    // Clear selection
-    function clearSelection() {
-        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
-            checkbox.checked = false;
-            const productId = checkbox.dataset.productId;
-            const quantityInput = document.querySelector(`input.quantity-input[data-product-id="${productId}"]`);
-            quantityInput.disabled = true;
-            quantityInput.value = 1;
-        });
-        updateSelection();
-    }
-
-    // Update size preview
-    function updateSizePreview() {
-        const select = document.getElementById('labelSizeSelect');
-        const selectedOption = select.options[select.selectedIndex];
-        const width = selectedOption.dataset.width;
-        const height = selectedOption.dataset.height;
-        const sizeInfo = document.getElementById('sizeInfo');
-        sizeInfo.textContent = `${width}mm × ${height}mm`;
-    }
-
-    // Print position adjustment
-    function adjustPosition(direction, amount) {
-        const stepSize = 2; // 2mm steps
-        
-        if (direction === 'h') {
-            const currentOffset = parseInt(document.getElementById('offsetX').value) || 0;
-            let newOffset;
-            if (amount === 0) {
-                newOffset = 0; // Center
-            } else {
-                newOffset = currentOffset + (amount * stepSize);
-            }
-            document.getElementById('offsetX').value = newOffset;
-            document.getElementById('offsetXDisplay').textContent = newOffset + 'mm';
-            localStorage.setItem('barcode_offset_x', newOffset);
-        } else if (direction === 'v') {
-            const currentOffset = parseInt(document.getElementById('offsetY').value) || 0;
-            let newOffset;
-            if (amount === 0) {
-                newOffset = 0; // Center
-            } else {
-                newOffset = currentOffset + (amount * stepSize);
-            }
-            document.getElementById('offsetY').value = newOffset;
-            document.getElementById('offsetYDisplay').textContent = newOffset + 'mm';
-            localStorage.setItem('barcode_offset_y', newOffset);
+    function drawGrid(scale, sH) {
+        const canvas = document.getElementById('gridCanvas');
+        canvas.width  = CANVAS_W;
+        canvas.height = sH;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,CANVAS_W,sH);
+        ctx.strokeStyle = '#93c5fd';
+        ctx.lineWidth   = 0.5;
+        const step5 = 5 * scale;
+        for (let x = 0; x <= CANVAS_W; x += step5) {
+            ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,sH); ctx.stroke();
+        }
+        for (let y = 0; y <= sH; y += step5) {
+            ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CANVAS_W,y); ctx.stroke();
         }
     }
 
+    function placeContent() {
+        const scale = getScale();
+        const sH    = Math.round(labelHmm * scale);
+        const dc    = document.getElementById('dragContent');
+
+        // Content box: 80% of label, then shifted
+        const cW = Math.round((labelWmm - 4) * scale);
+        const cH = Math.round(labelHmm * 0.72 * scale);
+        dc.style.width  = cW + 'px';
+        dc.style.height = cH + 'px';
+
+        // Center + offset
+        const cx = Math.round((CANVAS_W / 2) - (cW / 2) + offsetX * scale);
+        const cy = Math.round((sH / 2) - (cH / 2) + offsetY * scale);
+        dc.style.left = cx + 'px';
+        dc.style.top  = cy + 'px';
+
+        // scale preview text
+        const fBase = Math.max(6, Math.round(labelHmm * scale * 0.085));
+        document.getElementById('prev-name').style.fontSize  = fBase + 'px';
+        document.getElementById('prev-code').style.fontSize  = Math.max(5, fBase - 1) + 'px';
+        document.getElementById('prev-price').style.fontSize = fBase + 'px';
+        const barcodeH = Math.round(labelHmm * scale * 0.38);
+        document.getElementById('prev-barcode').style.height = barcodeH + 'px';
+        document.getElementById('prev-barcode').style.width  = 'auto';
+        document.getElementById('prev-barcode').style.maxWidth = '100%';
+
+        // show/hide name & price based on toggles
+        const showName  = document.getElementById('includeName').checked;
+        const showPrice = document.getElementById('includePrice').checked;
+        document.getElementById('prev-name').style.display  = showName  ? '' : 'none';
+        document.getElementById('prev-price').style.display = showPrice ? '' : 'none';
+    }
+
+    function applyGapZone() {
+        const scale  = getScale();
+        const gapH   = Math.max(0, Math.round(gap * scale));
+        const gz = document.getElementById('gapZone');
+        gz.style.height = gapH + 'px';
+        gz.style.width  = CANVAS_W + 'px';
+        document.getElementById('gapLabel').textContent = gap > 0 ? 'gap: ' + gap + 'mm' : gap < 0 ? 'gap: ' + gap + 'mm' : '';
+    }
+
+    /* ─── Drag-to-position ───────────────────────────── */
+    (function setupDrag() {
+        let dragging = false, startX, startY, startOX, startOY;
+
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.closest('#stickerArea') && !e.target.closest('#dragContent')) {
+                // clicking on sticker background — optional: do nothing
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dc = document.getElementById('dragContent');
+            dc.addEventListener('mousedown', startDrag);
+            dc.addEventListener('touchstart', startDrag, {passive:true});
+        });
+
+        function startDrag(e) {
+            dragging = true;
+            const p = e.touches ? e.touches[0] : e;
+            startX = p.clientX; startY = p.clientY;
+            startOX = offsetX; startOY = offsetY;
+            document.getElementById('dragContent').style.cursor = 'grabbing';
+            e.preventDefault && e.preventDefault();
+        }
+
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', function(e){ onMove(e.touches[0]); }, {passive:true});
+
+        function onMove(e) {
+            if (!dragging) return;
+            const scale  = getScale();
+            const dxPx   = e.clientX - startX;
+            const dyPx   = e.clientY - startY;
+            offsetX = +(startOX + dxPx / scale).toFixed(1);
+            offsetY = +(startOY + dyPx / scale).toFixed(1);
+            saveAndRender();
+        }
+
+        document.addEventListener('mouseup',  stopDrag);
+        document.addEventListener('touchend', stopDrag);
+        function stopDrag() {
+            dragging = false;
+            const dc = document.getElementById('dragContent');
+            if (dc) dc.style.cursor = 'grab';
+        }
+    })();
+
+    /* ─── Controls ───────────────────────────────────── */
+    function nudge(dx, dy) {
+        offsetX = +(offsetX + dx * stepMm).toFixed(1);
+        offsetY = +(offsetY + dy * stepMm).toFixed(1);
+        saveAndRender();
+    }
+
+    function setStep(s) {
+        stepMm = s;
+        document.querySelectorAll('.step-btn').forEach(b => {
+            b.classList.toggle('bg-blue-600', b.id === 'step-' + s);
+            b.classList.toggle('text-white',  b.id === 'step-' + s);
+            b.classList.toggle('border-blue-600', b.id === 'step-' + s);
+            b.classList.toggle('bg-white',    b.id !== 'step-' + s);
+            b.classList.toggle('text-gray-600', b.id !== 'step-' + s);
+        });
+    }
+
     function resetPosition() {
-        document.getElementById('offsetX').value = 0;
-        document.getElementById('offsetY').value = 0;
-        document.getElementById('offsetXDisplay').textContent = '0mm';
-        document.getElementById('offsetYDisplay').textContent = '0mm';
+        offsetX = 0; offsetY = 0;
+        saveAndRender();
         localStorage.removeItem('barcode_offset_x');
         localStorage.removeItem('barcode_offset_y');
     }
 
-    // Gap adjustment
-    function adjustGap(amount) {
-        const stepSize = 1; // 1mm steps for gap
-        const currentGap = parseInt(document.getElementById('stickerGap').value) || 0;
-        let newGap;
-        
-        if (amount === 0) {
-            newGap = 0; // No gap
-        } else {
-            newGap = currentGap + (amount * stepSize);
-            // Limit gap between -10mm and +10mm
-            newGap = Math.max(-10, Math.min(10, newGap));
-        }
-        
-        document.getElementById('stickerGap').value = newGap;
-        document.getElementById('gapDisplay').textContent = newGap + 'mm';
-        localStorage.setItem('barcode_sticker_gap', newGap);
+    function nudgeGap(d) { setGap(gap + d); }
+
+    function setGap(v) {
+        gap = Math.max(-10, Math.min(10, v));
+        document.getElementById('stickerGap').value  = gap;
+        document.getElementById('gapSlider').value   = gap;
+        document.getElementById('gapDisplay').textContent = gap + 'mm';
+        document.getElementById('gapLabel').textContent   = gap !== 0 ? 'gap: ' + gap + 'mm' : '';
+        applyGapZone();
+        localStorage.setItem('barcode_sticker_gap', gap);
     }
 
-    // Initialize size preview on page load
+    function saveAndRender() {
+        document.getElementById('offsetX').value = offsetX;
+        document.getElementById('offsetY').value = offsetY;
+        document.getElementById('offsetXDisplay').textContent = offsetX + 'mm';
+        document.getElementById('offsetYDisplay').textContent = offsetY + 'mm';
+        localStorage.setItem('barcode_offset_x', offsetX);
+        localStorage.setItem('barcode_offset_y', offsetY);
+        placeContent();
+    }
+
+    /* ─── Product list ───────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function() {
-        updateSizePreview();
-        updateSelection(); // Initialize selection state
-        
-        // Load saved offsets
-        const savedOffsetX = localStorage.getItem('barcode_offset_x');
-        const savedOffsetY = localStorage.getItem('barcode_offset_y');
-        const savedGap = localStorage.getItem('barcode_sticker_gap');
-        
-        if (savedOffsetX) {
-            document.getElementById('offsetX').value = savedOffsetX;
-            document.getElementById('offsetXDisplay').textContent = savedOffsetX + 'mm';
-        }
-        if (savedOffsetY) {
-            document.getElementById('offsetY').value = savedOffsetY;
-            document.getElementById('offsetYDisplay').textContent = savedOffsetY + 'mm';
-        }
-        if (savedGap) {
-            document.getElementById('stickerGap').value = savedGap;
-            document.getElementById('gapDisplay').textContent = savedGap + 'mm';
-        }
+        // restore saved values
+        offsetX = parseFloat(localStorage.getItem('barcode_offset_x') || 0);
+        offsetY = parseFloat(localStorage.getItem('barcode_offset_y') || 0);
+        gap     = parseFloat(localStorage.getItem('barcode_sticker_gap') || 0);
+
+        document.getElementById('offsetX').value = offsetX;
+        document.getElementById('offsetY').value = offsetY;
+        document.getElementById('stickerGap').value = gap;
+        document.getElementById('gapSlider').value  = gap;
+
+        setStep(1);
+        rebuildCanvas();
+        saveAndRender();
+        setGap(gap);
+        updateSelection();
+
+        // watch toggles
+        document.getElementById('includeName').addEventListener('change', placeContent);
+        document.getElementById('includePrice').addEventListener('change', placeContent);
+
+        // drag init (after DOM ready)
+        const dc = document.getElementById('dragContent');
+        dc.addEventListener('mousedown', function(e) {
+            let dragging = true;
+            const scale = getScale();
+            const sx = e.clientX, sy = e.clientY;
+            const sox = offsetX, soy = offsetY;
+            dc.style.cursor = 'grabbing';
+            function onMove(ev) {
+                if (!dragging) return;
+                offsetX = +(sox + (ev.clientX - sx) / scale).toFixed(1);
+                offsetY = +(soy + (ev.clientY - sy) / scale).toFixed(1);
+                saveAndRender();
+            }
+            function onUp() {
+                dragging = false;
+                dc.style.cursor = 'grab';
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup',  onUp);
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup',   onUp);
+            e.preventDefault();
+        });
+
+        dc.addEventListener('touchstart', function(e) {
+            const t0 = e.touches[0];
+            const sx = t0.clientX, sy = t0.clientY;
+            const sox = offsetX, soy = offsetY;
+            const scale = getScale();
+            function onMove(ev) {
+                const t = ev.touches[0];
+                offsetX = +(sox + (t.clientX - sx) / scale).toFixed(1);
+                offsetY = +(soy + (t.clientY - sy) / scale).toFixed(1);
+                saveAndRender();
+            }
+            function onEnd() {
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend',  onEnd);
+            }
+            document.addEventListener('touchmove', onMove, {passive:true});
+            document.addEventListener('touchend',  onEnd);
+        }, {passive:true});
     });
+
+    // Search
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('productSearch').addEventListener('input', function(e) {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('.product-item').forEach(p => {
+                p.classList.toggle('hidden',
+                    !p.dataset.name.includes(q) &&
+                    !p.dataset.sku.includes(q) &&
+                    !p.dataset.barcode.includes(q));
+            });
+        });
+
+        document.querySelectorAll('.product-checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                document.querySelector(`input.quantity-input[data-product-id="${this.dataset.productId}"]`).disabled = !this.checked;
+                updateSelection();
+            });
+        });
+
+        document.querySelectorAll('.quantity-input').forEach(inp => inp.addEventListener('change', updateSelection));
+    });
+
+    function updateSelection() {
+        const checked = document.querySelectorAll('.product-checkbox:checked');
+        let total = 0;
+        const div = document.getElementById('selectedProducts');
+        div.innerHTML = '';
+        checked.forEach((cb, i) => {
+            const qty = parseInt(document.querySelector(`input.quantity-input[data-product-id="${cb.dataset.productId}"]`).value) || 1;
+            total += qty;
+            div.innerHTML += `<input type="hidden" name="products[${i}][id]" value="${cb.dataset.productId}">
+                              <input type="hidden" name="products[${i}][quantity]" value="${qty}">`;
+        });
+        document.getElementById('selectedCount').textContent = checked.length;
+        document.getElementById('totalLabels').textContent   = total;
+        document.getElementById('printButton').disabled = checked.length === 0;
+
+        // update preview with first checked product name/price
+        if (checked.length > 0) {
+            const cb = checked[0];
+            document.getElementById('prev-name').textContent  = cb.dataset.productName  || 'Product';
+            document.getElementById('prev-code').textContent  = cb.dataset.productBarcode || cb.dataset.productSku || '0000000000';
+            document.getElementById('prev-price').textContent = '৳' + parseFloat(cb.dataset.productPrice || 0).toFixed(2);
+        }
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.product-item:not(.hidden) .product-checkbox').forEach(cb => {
+            cb.checked = true;
+            document.querySelector(`input.quantity-input[data-product-id="${cb.dataset.productId}"]`).disabled = false;
+        });
+        updateSelection();
+    }
+
+    function clearSelection() {
+        document.querySelectorAll('.product-checkbox').forEach(cb => {
+            cb.checked = false;
+            const qi = document.querySelector(`input.quantity-input[data-product-id="${cb.dataset.productId}"]`);
+            qi.disabled = true; qi.value = 1;
+        });
+        updateSelection();
+    }
+
+    // rebuild canvas on resize
+    window.addEventListener('resize', rebuildCanvas);
 </script>
 @endsection
