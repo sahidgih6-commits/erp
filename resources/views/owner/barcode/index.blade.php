@@ -159,86 +159,15 @@
                       </div>
                     </div>
 
-                    <!-- ── LIVE CANVAS EDITOR ── -->
+                    <!-- ── LIVE PREVIEW — ALL STICKERS ── -->
                     <div class="bg-gray-900 rounded-2xl shadow-xl p-5">
-                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Live Preview  <span class="text-gray-600 normal-case font-normal">— drag content to reposition</span></p>
-                      <p class="text-xs text-gray-500 mb-3">White area = printable &nbsp;·&nbsp; Gray border = sticker edge &nbsp;·&nbsp; Grid = 5mm</p>
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Print Preview  <span class="text-gray-600 normal-case font-normal">— all selected stickers</span></p>
+                      <p class="text-xs text-gray-500 mb-3">White = printable area &nbsp;·&nbsp; Gray = sticker border &nbsp;·&nbsp; Hatched = gap between stickers</p>
 
-                      <!-- Canvas wrapper: centered -->
-                      <div class="flex justify-center">
-                        <div id="canvasWrap" class="relative select-none" style="width:240px;">
-
-                          <!-- Physical sticker backing (gray border = non-printable gutter) -->
-                          <div id="stickerBacking"
-                               style="background:#e5e7eb; border-radius:8px; padding:6px; box-shadow:0 2px 8px rgba(0,0,0,.3);">
-
-                          <!-- Printable area (white) -->
-                          <div id="stickerArea"
-                               class="relative overflow-hidden bg-white"
-                               style="border-radius:4px; cursor:crosshair;">
-
-                            <!-- Grid overlay -->
-                            <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none" style="opacity:.3;"></canvas>
-
-                            <!-- Draggable content block -->
-                            <div id="dragContent"
-                                 class="absolute flex flex-col items-center justify-center pointer-events-auto"
-                                 style="cursor:grab; user-select:none; padding:2px;">
-                              <div id="prev-name"  class="font-bold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis" style="font-size:9px; max-width:100%;">Product Name</div>
-                              <!-- barcode bars (SVG placeholder) -->
-                              <svg id="prev-barcode" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" style="display:block;margin:1px auto;">
-                                <rect x="0"  width="3" height="40" fill="#000"/>
-                                <rect x="5"  width="2" height="40" fill="#000"/>
-                                <rect x="9"  width="4" height="40" fill="#000"/>
-                                <rect x="15" width="1" height="40" fill="#000"/>
-                                <rect x="18" width="3" height="40" fill="#000"/>
-                                <rect x="23" width="2" height="40" fill="#000"/>
-                                <rect x="27" width="4" height="40" fill="#000"/>
-                                <rect x="33" width="1" height="40" fill="#000"/>
-                                <rect x="36" width="2" height="40" fill="#000"/>
-                                <rect x="40" width="3" height="40" fill="#000"/>
-                                <rect x="45" width="1" height="40" fill="#000"/>
-                                <rect x="48" width="4" height="40" fill="#000"/>
-                                <rect x="54" width="2" height="40" fill="#000"/>
-                                <rect x="58" width="3" height="40" fill="#000"/>
-                                <rect x="63" width="1" height="40" fill="#000"/>
-                                <rect x="66" width="2" height="40" fill="#000"/>
-                                <rect x="70" width="4" height="40" fill="#000"/>
-                                <rect x="76" width="1" height="40" fill="#000"/>
-                                <rect x="79" width="3" height="40" fill="#000"/>
-                                <rect x="84" width="2" height="40" fill="#000"/>
-                                <rect x="88" width="1" height="40" fill="#000"/>
-                                <rect x="91" width="4" height="40" fill="#000"/>
-                                <rect x="97" width="2" height="40" fill="#000"/>
-                                <rect x="101" width="3" height="40" fill="#000"/>
-                                <rect x="106" width="1" height="40" fill="#000"/>
-                                <rect x="109" width="2" height="40" fill="#000"/>
-                                <rect x="113" width="4" height="40" fill="#000"/>
-                                <rect x="119" width="1" height="40" fill="#000"/>
-                              </svg>
-                              <div id="prev-code"  class="text-gray-600"   style="font-size:7px;">0000000000</div>
-                              <div id="prev-price" class="font-bold text-gray-900" style="font-size:9px;">Tk0.00</div>
-                            </div>
-
-                            <!-- Crosshair center mark -->
-                            <div class="absolute pointer-events-none" id="centerMark"
-                                 style="top:50%;left:50%;transform:translate(-50%,-50%);opacity:.25;">
-                              <div style="width:1px;height:100%;background:#3b82f6;position:absolute;left:50%;top:0;"></div>
-                              <div style="height:1px;width:100%;background:#3b82f6;position:absolute;top:50%;left:0;"></div>
-                            </div>
-                          </div>
-                          </div><!-- /stickerBacking -->
-
-                          <!-- Gap zone -->
-                          <div id="gapZone"
-                               style="background:repeating-linear-gradient(45deg,#374151 0,#374151 3px,transparent 3px,transparent 10px);
-                                      border:1px dashed #4b5563; border-top:none; border-radius:0 0 4px 4px; height:0px; overflow:hidden; transition:height .2s;">
-                            <div class="flex items-center justify-center h-full">
-                              <span class="text-gray-400" style="font-size:9px;" id="gapLabel">gap: 0mm</span>
-                            </div>
-                          </div>
-
-                        </div>
+                      <!-- Scrollable sticker strip -->
+                      <div id="stickerStrip" class="flex flex-col items-center overflow-y-auto" style="max-height:420px; scrollbar-width:thin;">
+                        <!-- Stickers will be injected here by JS -->
+                        <div class="text-gray-600 text-xs py-8">Select products to see preview</div>
                       </div>
 
                       <!-- Offset readout badges -->
@@ -426,136 +355,96 @@
         labelWmm = parseFloat(opt.dataset.width);
         labelHmm = parseFloat(opt.dataset.height);
         document.getElementById('sizeInfo').textContent = labelWmm + 'mm × ' + labelHmm + 'mm';
-
-        const scale  = getScale();
-        const sH     = Math.round(labelHmm * scale);
-
-        const area = document.getElementById('stickerArea');
-        area.style.width  = CANVAS_W + 'px';
-        area.style.height = sH + 'px';
-
-        const wrap = document.getElementById('canvasWrap');
-        wrap.style.width = CANVAS_W + 'px';
-
-        // center mark
-        const cm = document.getElementById('centerMark');
-        cm.style.width  = CANVAS_W + 'px';
-        cm.style.height = sH + 'px';
-
-        // draw grid
-        drawGrid(scale, sH);
-        // place content
-        placeContent();
-        // apply gap zone
-        applyGapZone();
-    }
-
-    function drawGrid(scale, sH) {
-        const canvas = document.getElementById('gridCanvas');
-        canvas.width  = CANVAS_W;
-        canvas.height = sH;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,CANVAS_W,sH);
-        ctx.strokeStyle = '#93c5fd';
-        ctx.lineWidth   = 0.5;
-        const step5 = 5 * scale;
-        for (let x = 0; x <= CANVAS_W; x += step5) {
-            ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,sH); ctx.stroke();
-        }
-        for (let y = 0; y <= sH; y += step5) {
-            ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(CANVAS_W,y); ctx.stroke();
-        }
+        renderStickerStrip();
     }
 
     function placeContent() {
-        const scale = getScale();
-        const sH    = Math.round(labelHmm * scale);
-        const dc    = document.getElementById('dragContent');
-
-        // Content box: shrink by sideMargin on each side, then shifted
-        const cW = Math.round((labelWmm - 4 - sideMargin * 2) * scale);
-        const cH = Math.round(labelHmm * 0.72 * scale);
-        dc.style.width  = cW + 'px';
-        dc.style.height = cH + 'px';
-
-        // Center + offset
-        const cx = Math.round((CANVAS_W / 2) - (cW / 2) + offsetX * scale);
-        const cy = Math.round((sH / 2) - (cH / 2) + offsetY * scale);
-        dc.style.left = cx + 'px';
-        dc.style.top  = cy + 'px';
-
-        // scale preview text
-        const fBase = Math.max(6, Math.round(labelHmm * scale * 0.085));
-        document.getElementById('prev-name').style.fontSize  = fBase + 'px';
-        document.getElementById('prev-code').style.fontSize  = Math.max(5, fBase - 1) + 'px';
-        document.getElementById('prev-price').style.fontSize = fBase + 'px';
-        const barcodeH = Math.round(labelHmm * scale * 0.38);
-        document.getElementById('prev-barcode').style.height = barcodeH + 'px';
-        document.getElementById('prev-barcode').style.width  = 'auto';
-        document.getElementById('prev-barcode').style.maxWidth = '100%';
-
-        // show/hide name & price based on toggles
-        const showName  = document.getElementById('includeName').checked;
-        const showPrice = document.getElementById('includePrice').checked;
-        document.getElementById('prev-name').style.display  = showName  ? '' : 'none';
-        document.getElementById('prev-price').style.display = showPrice ? '' : 'none';
+        // Now handled by renderStickerStrip
+        renderStickerStrip();
     }
 
     function applyGapZone() {
-        const scale  = getScale();
-        const gapH   = Math.max(0, Math.round(gap * scale));
-        const gz = document.getElementById('gapZone');
-        gz.style.height = gapH + 'px';
-        gz.style.width  = CANVAS_W + 'px';
-        document.getElementById('gapLabel').textContent = gap > 0 ? 'gap: ' + gap + 'mm' : gap < 0 ? 'gap: ' + gap + 'mm' : '';
+        document.getElementById('gapDisplay').textContent = gap + 'mm';
+        renderStickerStrip();
     }
 
-    /* ─── Drag-to-position ───────────────────────────── */
-    (function setupDrag() {
-        let dragging = false, startX, startY, startOX, startOY;
+    function renderStickerStrip() {
+        const strip = document.getElementById('stickerStrip');
+        const scale = getScale();
+        const sW = CANVAS_W;
+        const sH = Math.round(labelHmm * scale);
+        const showName  = document.getElementById('includeName').checked;
+        const showPrice = document.getElementById('includePrice').checked;
+        const gapPx = Math.max(0, Math.round(gap * scale));
 
-        document.addEventListener('mousedown', function(e) {
-            if (e.target.closest('#stickerArea') && !e.target.closest('#dragContent')) {
-                // clicking on sticker background — optional: do nothing
+        // Gather all selected products × quantity
+        const items = [];
+        document.querySelectorAll('.product-checkbox:checked').forEach(cb => {
+            const qty = parseInt(document.querySelector(`input.quantity-input[data-product-id="${cb.dataset.productId}"]`).value) || 1;
+            for (let i = 0; i < qty; i++) {
+                items.push({
+                    name: cb.dataset.productName || 'Product',
+                    code: cb.dataset.productBarcode || cb.dataset.productSku || '00000000',
+                    price: 'Tk' + parseFloat(cb.dataset.productPrice || 0).toFixed(2)
+                });
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const dc = document.getElementById('dragContent');
-            dc.addEventListener('mousedown', startDrag);
-            dc.addEventListener('touchstart', startDrag, {passive:true});
+        if (items.length === 0) {
+            strip.innerHTML = '<div class="text-gray-600 text-xs py-8">Select products to see preview</div>';
+            return;
+        }
+
+        // Sizing
+        const fName  = Math.max(7, Math.round(sH * 0.09));
+        const fCode  = Math.max(5, fName - 2);
+        const fPrice = Math.max(7, fName);
+        const barcodeH = Math.round(sH * 0.38);
+        const sidePx = Math.round(sideMargin * scale);
+        const contentW = sW - 12 - sidePx * 2; // 6px backing each side + sideMargin
+
+        let html = '';
+        items.forEach((item, idx) => {
+            // Sticker
+            html += `<div style="width:${sW}px; flex-shrink:0;">`;
+            // Backing (gray border = physical sticker edge)
+            html += `<div style="background:#e5e7eb; border-radius:6px; padding:4px ${6 + sidePx}px; box-shadow:0 1px 4px rgba(0,0,0,.25);">`;
+            // White printable area
+            html += `<div style="background:white; border-radius:3px; width:100%; height:${sH}px; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; position:relative;">`;
+            // Content with offset
+            html += `<div style="transform:translate(${offsetX * scale}px, ${offsetY * scale}px); display:flex; flex-direction:column; align-items:center; justify-content:center; max-width:${contentW}px; overflow:hidden;">`;
+            if (showName) {
+                html += `<div style="font-size:${fName}px; font-weight:bold; color:#1f2937; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:${contentW}px;">${item.name}</div>`;
+            }
+            // Barcode placeholder
+            html += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" style="display:block; height:${barcodeH}px; width:auto; max-width:${contentW}px; margin:1px 0;">`;
+            html += '<rect x="0" width="3" height="40" fill="#000"/><rect x="5" width="2" height="40" fill="#000"/><rect x="9" width="4" height="40" fill="#000"/><rect x="15" width="1" height="40" fill="#000"/>';
+            html += '<rect x="18" width="3" height="40" fill="#000"/><rect x="23" width="2" height="40" fill="#000"/><rect x="27" width="4" height="40" fill="#000"/><rect x="33" width="1" height="40" fill="#000"/>';
+            html += '<rect x="36" width="2" height="40" fill="#000"/><rect x="40" width="3" height="40" fill="#000"/><rect x="45" width="1" height="40" fill="#000"/><rect x="48" width="4" height="40" fill="#000"/>';
+            html += '<rect x="54" width="2" height="40" fill="#000"/><rect x="58" width="3" height="40" fill="#000"/><rect x="63" width="1" height="40" fill="#000"/><rect x="66" width="2" height="40" fill="#000"/>';
+            html += '<rect x="70" width="4" height="40" fill="#000"/><rect x="76" width="1" height="40" fill="#000"/><rect x="79" width="3" height="40" fill="#000"/><rect x="84" width="2" height="40" fill="#000"/>';
+            html += '<rect x="88" width="1" height="40" fill="#000"/><rect x="91" width="4" height="40" fill="#000"/><rect x="97" width="2" height="40" fill="#000"/><rect x="101" width="3" height="40" fill="#000"/>';
+            html += '<rect x="106" width="1" height="40" fill="#000"/><rect x="109" width="2" height="40" fill="#000"/><rect x="113" width="4" height="40" fill="#000"/><rect x="119" width="1" height="40" fill="#000"/>';
+            html += '</svg>';
+            html += `<div style="font-size:${fCode}px; color:#6b7280;">${item.code}</div>`;
+            if (showPrice) {
+                html += `<div style="font-size:${fPrice}px; font-weight:bold; color:#111827;">${item.price}</div>`;
+            }
+            html += '</div>'; // content
+            html += '</div>'; // white area
+            html += '</div>'; // backing
+            html += '</div>'; // sticker wrapper
+
+            // Gap between stickers (not after last one)
+            if (idx < items.length - 1 && gapPx > 0) {
+                html += `<div style="width:${sW}px; height:${gapPx}px; background:repeating-linear-gradient(45deg,#374151 0,#374151 3px,transparent 3px,transparent 10px); border-left:1px dashed #4b5563; border-right:1px dashed #4b5563; display:flex; align-items:center; justify-content:center;">`;
+                html += `<span style="font-size:8px; color:#9ca3af; background:rgba(31,41,55,.7); padding:0 4px; border-radius:3px;">${gap}mm</span>`;
+                html += '</div>';
+            }
         });
 
-        function startDrag(e) {
-            dragging = true;
-            const p = e.touches ? e.touches[0] : e;
-            startX = p.clientX; startY = p.clientY;
-            startOX = offsetX; startOY = offsetY;
-            document.getElementById('dragContent').style.cursor = 'grabbing';
-            e.preventDefault && e.preventDefault();
-        }
-
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('touchmove', function(e){ onMove(e.touches[0]); }, {passive:true});
-
-        function onMove(e) {
-            if (!dragging) return;
-            const scale  = getScale();
-            const dxPx   = e.clientX - startX;
-            const dyPx   = e.clientY - startY;
-            offsetX = +(startOX + dxPx / scale).toFixed(1);
-            offsetY = +(startOY + dyPx / scale).toFixed(1);
-            saveAndRender();
-        }
-
-        document.addEventListener('mouseup',  stopDrag);
-        document.addEventListener('touchend', stopDrag);
-        function stopDrag() {
-            dragging = false;
-            const dc = document.getElementById('dragContent');
-            if (dc) dc.style.cursor = 'grab';
-        }
-    })();
+        strip.innerHTML = html;
+    }
 
     /* ─── Controls ───────────────────────────────────── */
     function nudge(dx, dy) {
@@ -589,9 +478,8 @@
         document.getElementById('stickerGap').value  = gap;
         document.getElementById('gapSlider').value   = gap;
         document.getElementById('gapDisplay').textContent = gap + 'mm';
-        document.getElementById('gapLabel').textContent   = gap !== 0 ? 'gap: ' + gap + 'mm' : '';
-        applyGapZone();
         localStorage.setItem('barcode_sticker_gap', gap);
+        renderStickerStrip();
     }
 
     let sideMargin = 0;
@@ -602,13 +490,7 @@
         document.getElementById('sideMarginSlider').value  = sideMargin;
         document.getElementById('sideMarginDisplay').textContent = sideMargin + 'mm';
         localStorage.setItem('barcode_side_margin', sideMargin);
-        // Update visual sticker border: base 6px + scaled side margin
-        const scale = getScale();
-        const extraPx = Math.round(sideMargin * scale);
-        const backing = document.getElementById('stickerBacking');
-        backing.style.paddingLeft  = (6 + extraPx) + 'px';
-        backing.style.paddingRight = (6 + extraPx) + 'px';
-        placeContent();
+        renderStickerStrip();
     }
 
     function saveAndRender() {
@@ -643,55 +525,12 @@
         rebuildCanvas();
         saveAndRender();
         setGap(gap);
+        setSideMargin(savedSM);
         updateSelection();
 
         // watch toggles
-        document.getElementById('includeName').addEventListener('change', placeContent);
-        document.getElementById('includePrice').addEventListener('change', placeContent);
-
-        // drag init (after DOM ready)
-        const dc = document.getElementById('dragContent');
-        dc.addEventListener('mousedown', function(e) {
-            let dragging = true;
-            const scale = getScale();
-            const sx = e.clientX, sy = e.clientY;
-            const sox = offsetX, soy = offsetY;
-            dc.style.cursor = 'grabbing';
-            function onMove(ev) {
-                if (!dragging) return;
-                offsetX = +(sox + (ev.clientX - sx) / scale).toFixed(1);
-                offsetY = +(soy + (ev.clientY - sy) / scale).toFixed(1);
-                saveAndRender();
-            }
-            function onUp() {
-                dragging = false;
-                dc.style.cursor = 'grab';
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup',  onUp);
-            }
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup',   onUp);
-            e.preventDefault();
-        });
-
-        dc.addEventListener('touchstart', function(e) {
-            const t0 = e.touches[0];
-            const sx = t0.clientX, sy = t0.clientY;
-            const sox = offsetX, soy = offsetY;
-            const scale = getScale();
-            function onMove(ev) {
-                const t = ev.touches[0];
-                offsetX = +(sox + (t.clientX - sx) / scale).toFixed(1);
-                offsetY = +(soy + (t.clientY - sy) / scale).toFixed(1);
-                saveAndRender();
-            }
-            function onEnd() {
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend',  onEnd);
-            }
-            document.addEventListener('touchmove', onMove, {passive:true});
-            document.addEventListener('touchend',  onEnd);
-        }, {passive:true});
+        document.getElementById('includeName').addEventListener('change', renderStickerStrip);
+        document.getElementById('includePrice').addEventListener('change', renderStickerStrip);
     });
 
     // Search
@@ -731,13 +570,8 @@
         document.getElementById('totalLabels').textContent   = total;
         document.getElementById('printButton').disabled = checked.length === 0;
 
-        // update preview with first checked product name/price
-        if (checked.length > 0) {
-            const cb = checked[0];
-            document.getElementById('prev-name').textContent  = cb.dataset.productName  || 'Product';
-            document.getElementById('prev-code').textContent  = cb.dataset.productBarcode || cb.dataset.productSku || '0000000000';
-            document.getElementById('prev-price').textContent = 'Tk' + parseFloat(cb.dataset.productPrice || 0).toFixed(2);
-        }
+        // Rebuild the sticker strip preview
+        renderStickerStrip();
     }
 
     function selectAll() {
