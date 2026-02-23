@@ -762,29 +762,20 @@
         
         function printLabels(printer) {
             const labelSize = '{{ $labelSize }}';
-            const stickerGap = {{ $stickerGap ?? 0 }};  // positive = shift UP, negative = shift DOWN
             const offsetX   = {{ $offsetX ?? 0 }};
             const offsetY   = {{ $offsetY ?? 0 }};
             const parts  = labelSize.split('x');
             const labelW = parseFloat(parts[0]) || 50;
             const labelH = parseFloat(parts[1]) || 30;
-
-            // ALWAYS pageH = labelH — Rongta gap sensor handles physical spacing between labels.
-            // Adding gap to pageH causes double-spacing. Gap here = content Y shift only.
-            const pageH = labelH;
-
-            // stickerGap shifts content UP (positive) or DOWN (negative) within the label
-            const totalOffsetY = +(offsetY - stickerGap).toFixed(1);
+            const pageH  = labelH; // always labelH — Rongta gap sensor handles physical spacing
 
             // Proportional font sizes (pt) relative to label height
             const namePt   = Math.max(6,  +(labelH * 0.22).toFixed(1));
             const codePt   = Math.max(5,  +(labelH * 0.17).toFixed(1));
             const pricePt  = Math.max(7,  +(labelH * 0.25).toFixed(1));
             const barcodeH = +(labelH * 0.52).toFixed(1);
-            // Reduce content width only by horizontal offset to avoid edge clipping
             const contentW = +Math.max(15, (labelW - 2 - Math.abs(offsetX))).toFixed(1);
 
-            // QZ config — pageH = labelH exactly, printer gap sensor handles label spacing
             let config = qz.configs.create(printer, {
                 density: 203,
                 size: { width: labelW, height: pageH, units: 'mm' },
@@ -793,9 +784,7 @@
                 scaleContent: true
             });
 
-            // KEY FIX: barcode-svg uses height-only sizing, width:auto
-            // This preserves CODE128 bar width ratios so phone scanners can read it.
-            // Forcing a specific mm width on the SVG distorts narrow/wide bar ratios.
+            // offsetX / offsetY used EXACTLY as shown in the canvas preview — no gap adjustment
             const printCss = [
                 '* { margin:0; padding:0; box-sizing:border-box; }',
                 '@page { size:' + labelW + 'mm ' + pageH + 'mm; margin:0; }',
@@ -804,7 +793,7 @@
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
                 '  display:flex; flex-direction:column; justify-content:center; align-items:center;',
                 '  background:white; overflow:hidden; }',
-                '.barcode-content { transform:translate(' + offsetX + 'mm,' + totalOffsetY + 'mm);',
+                '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm) !important;',
                 '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
                 '  max-width:' + contentW + 'mm; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
