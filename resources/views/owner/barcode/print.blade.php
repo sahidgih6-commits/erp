@@ -78,6 +78,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            /* Shrink by abs(offset) so shifted content never overflows paper edge */
+            max-width: calc(100% - {{ abs($offsetX ?? 0) }}mm);
+            max-height: calc(100% - {{ abs($offsetY ?? 0) }}mm);
+            overflow: hidden;
         }
         
         .product-name {
@@ -419,6 +423,9 @@
             }
             .barcode-content {
                 transform: translate({{ $offsetX ?? 0 }}mm, {{ $offsetY ?? 0 }}mm) !important;
+                max-width: calc(100% - {{ abs($offsetX ?? 0) }}mm) !important;
+                max-height: calc(100% - {{ abs($offsetY ?? 0) }}mm) !important;
+                overflow: hidden !important;
             }
             .barcode-label:last-child {
                 page-break-after: auto;
@@ -769,7 +776,9 @@
             const codePt    = Math.max(5,  +(labelH * 0.17).toFixed(1));
             const pricePt   = Math.max(7,  +(labelH * 0.25).toFixed(1));
             const barcodeH  = +(labelH * 0.50).toFixed(1);
-            const contentW  = +(labelW - 2).toFixed(1);
+            // Shrink content width by the absolute horizontal offset so it never overflows the paper edge
+            const contentW  = +Math.max(10, (labelW - 2 - Math.abs(offsetX))).toFixed(1);
+            const contentH  = +Math.max(5,  (labelH - 2 - Math.abs(offsetY))).toFixed(1);
 
             // QZ config — size in mm, scaleContent:true so QZ scales HTML to fit label exactly
             let config = qz.configs.create(printer, {
@@ -789,10 +798,12 @@
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
                 '  display:flex; flex-direction:column; justify-content:center; align-items:center; background:white; }',
                 '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm);',
-                '  display:flex; flex-direction:column; align-items:center; justify-content:center; width:' + contentW + 'mm; }',
+                '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
+                '  width:' + contentW + 'mm; max-height:' + contentH + 'mm; overflow:hidden; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
                 '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
                 '.barcode-svg { width:' + contentW + 'mm; height:' + barcodeH + 'mm; display:block; }',
+                '.barcode-svg svg { overflow:hidden; }',
                 '.barcode-svg svg { width:100%; height:100%; display:block; }',
                 '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.3mm; text-align:center; }',
                 '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.3mm; text-align:center; }'
