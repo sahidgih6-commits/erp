@@ -395,11 +395,11 @@
             return;
         }
 
-        // Sizing
-        const fName  = Math.max(7, Math.round(sH * 0.09));
+        // Sizing — compact barcode for small stickers
+        const fName  = Math.max(7, Math.round(sH * 0.08));
         const fCode  = Math.max(5, fName - 2);
         const fPrice = Math.max(7, fName);
-        const barcodeH = Math.round(sH * 0.38);
+        const barcodeH = Math.round(sH * 0.22);
         const sidePx = Math.round(sideMargin * scale);
         const contentW = sW - 12 - sidePx * 2; // 6px backing each side + sideMargin
 

@@ -186,7 +186,7 @@
             text-overflow: ellipsis;
         }
         .label-38x24 .barcode-svg {
-            height: 8mm;
+            height: 6mm;
             width: 100%;
             margin: 0;
             display: flex;
@@ -196,7 +196,7 @@
         .label-38x24 .barcode-svg svg {
             max-width: 100%;
             height: auto;
-            max-height: 8mm;
+            max-height: 6mm;
             display: block;
         }
         .label-38x24 .barcode-text {
@@ -633,17 +633,17 @@
             const widthScale = Math.max(0.55, Math.min(1, effectiveW / labelW));
             
             // Configure barcode settings based on label size
-            // Reduced margins for compact printing, but still scannable
+            // Compact bar heights for small business stickers — still scannable
             const barcodeSettings = {
-                '20x10': { width: 2, height: 20, fontSize: 8, margin: 0.5 },
-                '30x20': { width: 2.5, height: 30, fontSize: 10, margin: 1 },
-                '38x24': { width: 1.3, height: 18, fontSize: 7,  margin: 0 },
-                '40x30': { width: 3, height: 40, fontSize: 12, margin: 1 },
-                '45x35': { width: 3, height: 48, fontSize: 13, margin: 1 },
-                '50x30': { width: 3, height: 45, fontSize: 12, margin: 1 },
-                '60x40': { width: 3.5, height: 55, fontSize: 14, margin: 1.5 },
-                '70x50': { width: 4, height: 65, fontSize: 16, margin: 1.5 },
-                '100x50': { width: 4.5, height: 75, fontSize: 18, margin: 2 }
+                '20x10': { width: 1,   height: 8,  fontSize: 6, margin: 0 },
+                '30x20': { width: 1,   height: 12, fontSize: 7, margin: 0 },
+                '38x24': { width: 1,   height: 12, fontSize: 7, margin: 0 },
+                '40x30': { width: 1.2, height: 15, fontSize: 8, margin: 0 },
+                '45x35': { width: 1.2, height: 18, fontSize: 9, margin: 0 },
+                '50x30': { width: 1.2, height: 15, fontSize: 8, margin: 0 },
+                '60x40': { width: 1.5, height: 20, fontSize: 10, margin: 0.5 },
+                '70x50': { width: 1.5, height: 25, fontSize: 11, margin: 0.5 },
+                '100x50': { width: 2,  height: 30, fontSize: 12, margin: 1 }
             };
             
             const settings = barcodeSettings[labelSize] || barcodeSettings['45x35'];
@@ -836,7 +836,7 @@
             const namePt   = isSmall ? 5.5 : Math.max(6,  +(labelH * 0.22).toFixed(1));
             const codePt   = isSmall ? 4   : Math.max(5,  +(labelH * 0.17).toFixed(1));
             const pricePt  = isSmall ? 5.5 : Math.max(6,  +(labelH * 0.25).toFixed(1));
-            const barcodeH = isSmall ? +(labelH * 0.35).toFixed(1) : +(labelH * 0.48).toFixed(1);
+            const barcodeH = isSmall ? +(labelH * 0.28).toFixed(1) : +(labelH * 0.30).toFixed(1);
             // sideMargin shrinks content from BOTH sides equally
             const contentW = +Math.max(10, (labelW - 2 - (sideMargin * 2) - Math.abs(offsetX))).toFixed(1);
 
