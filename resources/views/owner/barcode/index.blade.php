@@ -162,16 +162,20 @@
                     <!-- ── LIVE CANVAS EDITOR ── -->
                     <div class="bg-gray-900 rounded-2xl shadow-xl p-5">
                       <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Live Preview  <span class="text-gray-600 normal-case font-normal">— drag content to reposition</span></p>
-                      <p class="text-xs text-gray-500 mb-3">Blue border = sticker edge &nbsp;·&nbsp; Gray band = gap zone &nbsp;·&nbsp; Grid = 5mm</p>
+                      <p class="text-xs text-gray-500 mb-3">White area = printable &nbsp;·&nbsp; Gray border = sticker edge &nbsp;·&nbsp; Grid = 5mm</p>
 
                       <!-- Canvas wrapper: centered -->
                       <div class="flex justify-center">
                         <div id="canvasWrap" class="relative select-none" style="width:240px;">
 
-                          <!-- Sticker area -->
+                          <!-- Physical sticker backing (gray border = non-printable gutter) -->
+                          <div id="stickerBacking"
+                               style="background:#e5e7eb; border-radius:8px; padding:6px; box-shadow:0 2px 8px rgba(0,0,0,.3);">
+
+                          <!-- Printable area (white) -->
                           <div id="stickerArea"
                                class="relative overflow-hidden bg-white"
-                               style="border:2px solid #3b82f6; border-radius:4px; cursor:crosshair;">
+                               style="border-radius:4px; cursor:crosshair;">
 
                             <!-- Grid overlay -->
                             <canvas id="gridCanvas" class="absolute inset-0 pointer-events-none" style="opacity:.3;"></canvas>
@@ -213,7 +217,7 @@
                                 <rect x="119" width="1" height="40" fill="#000"/>
                               </svg>
                               <div id="prev-code"  class="text-gray-600"   style="font-size:7px;">0000000000</div>
-                              <div id="prev-price" class="font-bold text-gray-900" style="font-size:9px;">৳0.00</div>
+                              <div id="prev-price" class="font-bold text-gray-900" style="font-size:9px;">Tk0.00</div>
                             </div>
 
                             <!-- Crosshair center mark -->
@@ -223,6 +227,7 @@
                               <div style="height:1px;width:100%;background:#3b82f6;position:absolute;top:50%;left:0;"></div>
                             </div>
                           </div>
+                          </div><!-- /stickerBacking -->
 
                           <!-- Gap zone -->
                           <div id="gapZone"
@@ -597,6 +602,12 @@
         document.getElementById('sideMarginSlider').value  = sideMargin;
         document.getElementById('sideMarginDisplay').textContent = sideMargin + 'mm';
         localStorage.setItem('barcode_side_margin', sideMargin);
+        // Update visual sticker border: base 6px + scaled side margin
+        const scale = getScale();
+        const extraPx = Math.round(sideMargin * scale);
+        const backing = document.getElementById('stickerBacking');
+        backing.style.paddingLeft  = (6 + extraPx) + 'px';
+        backing.style.paddingRight = (6 + extraPx) + 'px';
         placeContent();
     }
 
@@ -725,7 +736,7 @@
             const cb = checked[0];
             document.getElementById('prev-name').textContent  = cb.dataset.productName  || 'Product';
             document.getElementById('prev-code').textContent  = cb.dataset.productBarcode || cb.dataset.productSku || '0000000000';
-            document.getElementById('prev-price').textContent = '৳' + parseFloat(cb.dataset.productPrice || 0).toFixed(2);
+            document.getElementById('prev-price').textContent = 'Tk' + parseFloat(cb.dataset.productPrice || 0).toFixed(2);
         }
     }
 

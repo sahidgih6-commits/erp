@@ -168,28 +168,30 @@
         .label-38x24 {
             width: 38mm;
             height: 24mm;
-            padding: 0;
+            padding: 1mm 2mm;
         }
         .label-38x24 .product-name {
-            font-size: 6pt;
+            font-size: 5.5pt;
             font-weight: bold;
-            margin: 0;
+            margin: 0 0 0.3mm 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .label-38x24 .barcode-svg {
-            height: 11mm;
+            height: 8mm;
             margin: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
         .label-38x24 .barcode-text {
-            font-size: 5pt;
-            margin: 0;
+            font-size: 4pt;
+            margin: 0.2mm 0 0 0;
         }
         .label-38x24 .price {
-            font-size: 6pt;
+            font-size: 5.5pt;
             font-weight: bold;
-            margin: 0;
+            margin: 0.2mm 0 0 0;
         }
 
         /* 40x30mm - Medium */
@@ -590,7 +592,7 @@
                         <div class="barcode-text">{{ $item['product']->barcode ?? $item['product']->sku ?? sprintf('%08d', $item['product']->id) }}</div>
                         
                         @if($includePrice)
-                            <div class="price">৳{{ number_format($item['product']->sell_price, 2) }}</div>
+                            <div class="price">Tk{{ number_format($item['product']->sell_price, 2) }}</div>
                         @endif
                     </div>
                 </div>
@@ -613,7 +615,7 @@
             const barcodeSettings = {
                 '20x10': { width: 2, height: 20, fontSize: 8, margin: 0.5 },
                 '30x20': { width: 2.5, height: 30, fontSize: 10, margin: 1 },
-                '38x24': { width: 2, height: 28, fontSize: 9,  margin: 0.5 },
+                '38x24': { width: 1.3, height: 18, fontSize: 7,  margin: 0 },
                 '40x30': { width: 3, height: 40, fontSize: 12, margin: 1 },
                 '45x35': { width: 3, height: 48, fontSize: 13, margin: 1 },
                 '50x30': { width: 3, height: 45, fontSize: 12, margin: 1 },
@@ -806,11 +808,12 @@
             const labelH = parseFloat(parts[1]) || 24;
             const pageH  = labelH; // always labelH — Rongta gap sensor handles physical spacing
 
-            // Proportional font sizes (pt) relative to label height
-            const namePt   = Math.max(5,  +(labelH * 0.22).toFixed(1));
-            const codePt   = Math.max(4,  +(labelH * 0.17).toFixed(1));
-            const pricePt  = Math.max(6,  +(labelH * 0.25).toFixed(1));
-            const barcodeH = +(labelH * 0.52).toFixed(1);
+            // Proportional font sizes (pt) — capped for small labels
+            const isSmall  = labelH <= 25;
+            const namePt   = isSmall ? 5.5 : Math.max(6,  +(labelH * 0.22).toFixed(1));
+            const codePt   = isSmall ? 4   : Math.max(5,  +(labelH * 0.17).toFixed(1));
+            const pricePt  = isSmall ? 5.5 : Math.max(6,  +(labelH * 0.25).toFixed(1));
+            const barcodeH = isSmall ? +(labelH * 0.35).toFixed(1) : +(labelH * 0.48).toFixed(1);
             // sideMargin shrinks content from BOTH sides equally
             const contentW = +Math.max(10, (labelW - 2 - (sideMargin * 2) - Math.abs(offsetX))).toFixed(1);
 
@@ -830,17 +833,17 @@
                 'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; overflow:hidden; }',
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
                 '  display:flex; flex-direction:column; justify-content:center; align-items:center;',
-                '  padding-left:' + sideMargin + 'mm; padding-right:' + sideMargin + 'mm;',
+                '  padding:' + (isSmall ? 1 : 0) + 'mm ' + Math.max(sideMargin, isSmall ? 2 : 0) + 'mm;',
                 '  background:white; overflow:hidden; }',
                 '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm) !important;',
                 '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
                 '  width:' + contentW + 'mm; max-width:' + contentW + 'mm; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
                 '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
-                '.barcode-svg { height:' + barcodeH + 'mm; width:auto; display:block; margin:0 auto; }',
+                '.barcode-svg { height:' + barcodeH + 'mm; width:auto; display:block; margin:0 auto; max-width:' + contentW + 'mm; overflow:hidden; }',
                 '.barcode-svg svg { height:100% !important; width:auto !important; display:block; }',
-                '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.3mm; text-align:center; }',
-                '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.3mm; text-align:center; }'
+                '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.2mm; text-align:center; }',
+                '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.2mm; text-align:center; }'
             ].join(' ');
 
             let printData = [];
