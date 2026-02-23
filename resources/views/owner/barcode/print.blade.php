@@ -164,6 +164,34 @@
             margin: 0;
         }
         
+        /* 38x24mm - Your Roll */
+        .label-38x24 {
+            width: 38mm;
+            height: 24mm;
+            padding: 0;
+        }
+        .label-38x24 .product-name {
+            font-size: 6pt;
+            font-weight: bold;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .label-38x24 .barcode-svg {
+            height: 11mm;
+            margin: 0;
+        }
+        .label-38x24 .barcode-text {
+            font-size: 5pt;
+            margin: 0;
+        }
+        .label-38x24 .price {
+            font-size: 6pt;
+            font-weight: bold;
+            margin: 0;
+        }
+
         /* 40x30mm - Medium */
         .label-40x30 {
             width: 40mm;
@@ -414,7 +442,7 @@
                 page-break-inside: avoid;
                 break-inside: avoid;
                 margin: 0mm 0mm {{ $stickerGap ?? 0 }}mm 0mm !important;
-                padding: 0mm !important;
+                padding: 0mm {{ $sideMargin ?? 0 }}mm !important;
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: center !important;
@@ -580,6 +608,7 @@
             const barcodeSettings = {
                 '20x10': { width: 2, height: 20, fontSize: 8, margin: 0.5 },
                 '30x20': { width: 2.5, height: 30, fontSize: 10, margin: 1 },
+                '38x24': { width: 2, height: 28, fontSize: 9,  margin: 0.5 },
                 '40x30': { width: 3, height: 40, fontSize: 12, margin: 1 },
                 '45x35': { width: 3, height: 48, fontSize: 13, margin: 1 },
                 '50x30': { width: 3, height: 45, fontSize: 12, margin: 1 },
@@ -761,20 +790,22 @@
         }
         
         function printLabels(printer) {
-            const labelSize = '{{ $labelSize }}';
-            const offsetX   = {{ $offsetX ?? 0 }};
-            const offsetY   = {{ $offsetY ?? 0 }};
+            const labelSize  = '{{ $labelSize }}';
+            const offsetX    = {{ $offsetX ?? 0 }};
+            const offsetY    = {{ $offsetY ?? 0 }};
+            const sideMargin = {{ $sideMargin ?? 0 }};
             const parts  = labelSize.split('x');
-            const labelW = parseFloat(parts[0]) || 50;
-            const labelH = parseFloat(parts[1]) || 30;
+            const labelW = parseFloat(parts[0]) || 38;
+            const labelH = parseFloat(parts[1]) || 24;
             const pageH  = labelH; // always labelH — Rongta gap sensor handles physical spacing
 
             // Proportional font sizes (pt) relative to label height
-            const namePt   = Math.max(6,  +(labelH * 0.22).toFixed(1));
-            const codePt   = Math.max(5,  +(labelH * 0.17).toFixed(1));
-            const pricePt  = Math.max(7,  +(labelH * 0.25).toFixed(1));
+            const namePt   = Math.max(5,  +(labelH * 0.22).toFixed(1));
+            const codePt   = Math.max(4,  +(labelH * 0.17).toFixed(1));
+            const pricePt  = Math.max(6,  +(labelH * 0.25).toFixed(1));
             const barcodeH = +(labelH * 0.52).toFixed(1);
-            const contentW = +Math.max(15, (labelW - 2 - Math.abs(offsetX))).toFixed(1);
+            // sideMargin shrinks content from BOTH sides equally
+            const contentW = +Math.max(10, (labelW - 2 - (sideMargin * 2) - Math.abs(offsetX))).toFixed(1);
 
             let config = qz.configs.create(printer, {
                 density: 203,
@@ -792,10 +823,11 @@
                 'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; overflow:hidden; }',
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
                 '  display:flex; flex-direction:column; justify-content:center; align-items:center;',
+                '  padding-left:' + sideMargin + 'mm; padding-right:' + sideMargin + 'mm;',
                 '  background:white; overflow:hidden; }',
                 '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm) !important;',
                 '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
-                '  max-width:' + contentW + 'mm; }',
+                '  width:' + contentW + 'mm; max-width:' + contentW + 'mm; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
                 '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
                 '.barcode-svg { height:' + barcodeH + 'mm; width:auto; display:block; margin:0 auto; }',

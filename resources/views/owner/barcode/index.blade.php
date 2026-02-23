@@ -145,8 +145,9 @@
                               required onchange="rebuildCanvas()">
                         <option value="20x10"  data-width="20"  data-height="10">20 × 10 mm — Mini</option>
                         <option value="30x20"  data-width="30"  data-height="20">30 × 20 mm — Small</option>
+                        <option value="38x24"  data-width="38"  data-height="24" selected>38 × 24 mm — Your Roll</option>
                         <option value="40x30"  data-width="40"  data-height="30">40 × 30 mm — Medium</option>
-                        <option value="45x35"  data-width="45"  data-height="35" selected>45 × 35 mm — Custom</option>
+                        <option value="45x35"  data-width="45"  data-height="35">45 × 35 mm — Custom</option>
                         <option value="50x30"  data-width="50"  data-height="30">50 × 30 mm — Standard</option>
                         <option value="60x40"  data-width="60"  data-height="40">60 × 40 mm — Large</option>
                         <option value="70x50"  data-width="70"  data-height="50">70 × 50 mm — XL</option>
@@ -154,7 +155,7 @@
                       </select>
                       <div class="mt-2 flex items-center gap-2 text-xs text-blue-700 bg-blue-50 rounded-lg px-3 py-2">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
-                        <span>Selected: <strong id="sizeInfo">45mm × 35mm</strong> — ensure roll matches</span>
+                        <span>Selected: <strong id="sizeInfo">38mm × 24mm</strong> — ensure roll matches</span>
                       </div>
                     </div>
 
@@ -289,6 +290,31 @@
 
                       <input type="hidden" name="offset_x" id="offsetX" value="0">
                       <input type="hidden" name="offset_y" id="offsetY" value="0">
+                    </div>
+
+                    <!-- ── SIDE MARGINS (Left & Right) ── -->
+                    <div class="bg-white rounded-2xl shadow p-5">
+                      <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Side Margins (Left &amp; Right)</p>
+                      <p class="text-xs text-gray-500 mb-3">Equal inset from both sides — use when sticker has a physical border or gutters</p>
+                      <div class="flex items-center gap-3">
+                        <button type="button" onclick="nudgeSideMargin(-0.5)"
+                          class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-red-100 text-gray-700 text-xl font-bold flex items-center justify-center transition">−</button>
+                        <div class="flex-1">
+                          <input type="range" id="sideMarginSlider" min="0" max="10" step="0.5" value="0"
+                                 class="w-full accent-indigo-500"
+                                 oninput="setSideMargin(parseFloat(this.value))">
+                          <div class="flex justify-between text-xs text-gray-400 mt-0.5">
+                            <span>0mm</span><span>5mm</span><span>10mm</span>
+                          </div>
+                        </div>
+                        <button type="button" onclick="nudgeSideMargin(0.5)"
+                          class="w-10 h-10 rounded-xl bg-gray-100 hover:bg-green-100 text-gray-700 text-xl font-bold flex items-center justify-center transition">+</button>
+                      </div>
+                      <div class="flex justify-between mt-2">
+                        <span class="text-xs text-gray-500">Each side: <strong id="sideMarginDisplay" class="text-indigo-600">0mm</strong></span>
+                        <button type="button" onclick="setSideMargin(0)" class="text-xs text-gray-400 hover:text-gray-600">Reset</button>
+                      </div>
+                      <input type="hidden" name="side_margin" id="sideMarginInput" value="0">
                     </div>
 
                     <!-- ── GAP BETWEEN STICKERS ── -->
@@ -441,8 +467,8 @@
         const sH    = Math.round(labelHmm * scale);
         const dc    = document.getElementById('dragContent');
 
-        // Content box: 80% of label, then shifted
-        const cW = Math.round((labelWmm - 4) * scale);
+        // Content box: shrink by sideMargin on each side, then shifted
+        const cW = Math.round((labelWmm - 4 - sideMargin * 2) * scale);
         const cH = Math.round(labelHmm * 0.72 * scale);
         dc.style.width  = cW + 'px';
         dc.style.height = cH + 'px';
@@ -563,6 +589,17 @@
         localStorage.setItem('barcode_sticker_gap', gap);
     }
 
+    let sideMargin = 0;
+    function nudgeSideMargin(d) { setSideMargin(sideMargin + d); }
+    function setSideMargin(v) {
+        sideMargin = Math.max(0, Math.min(10, +parseFloat(v).toFixed(1)));
+        document.getElementById('sideMarginInput').value   = sideMargin;
+        document.getElementById('sideMarginSlider').value  = sideMargin;
+        document.getElementById('sideMarginDisplay').textContent = sideMargin + 'mm';
+        localStorage.setItem('barcode_side_margin', sideMargin);
+        placeContent();
+    }
+
     function saveAndRender() {
         document.getElementById('offsetX').value = offsetX;
         document.getElementById('offsetY').value = offsetY;
@@ -584,6 +621,12 @@
         document.getElementById('offsetY').value = offsetY;
         document.getElementById('stickerGap').value = gap;
         document.getElementById('gapSlider').value  = gap;
+
+        const savedSM = parseFloat(localStorage.getItem('barcode_side_margin') || 0);
+        sideMargin = savedSM;
+        document.getElementById('sideMarginInput').value  = savedSM;
+        document.getElementById('sideMarginSlider').value = savedSM;
+        document.getElementById('sideMarginDisplay').textContent = savedSM + 'mm';
 
         setStep(1);
         rebuildCanvas();
