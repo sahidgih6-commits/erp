@@ -828,7 +828,8 @@
             const parts  = labelSize.split('x');
             const labelW = parseFloat(parts[0]) || 38;
             const labelH = parseFloat(parts[1]) || 24;
-            const pageH  = labelH; // always labelH — Rongta gap sensor handles physical spacing
+            const stickerGap = {{ $stickerGap ?? 0 }};
+            const pageH  = Math.max(10, labelH + stickerGap); // gap adjusts feed distance per label
 
             // Proportional font sizes (pt) — capped for small labels
             const isSmall  = labelH <= 25;
