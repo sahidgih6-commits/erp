@@ -561,12 +561,12 @@
     <div class="paper-size-warning no-print" id="sizeWarning">
         <strong>⚠️ IMPORTANT: Set Paper Size</strong>
         <div style="text-align: center; margin: 15px 0;">
-            Required size: <code>45mm × 35mm</code>
+            Required size: <code>{{ str_replace('x', 'mm × ', $labelSize) }}mm</code>
         </div>
         <ol>
             <li>Press <strong>Ctrl+P</strong> to open print dialog</li>
             <li>Click <strong>"More settings"</strong></li>
-            <li>Under <strong>"Paper size"</strong>, select your Rongta 45×35mm option</li>
+            <li>Under <strong>"Paper size"</strong>, select your Rongta {{ str_replace('x', '×', $labelSize) }}mm option</li>
             <li>If not available, configure custom size in printer properties</li>
         </ol>
         <button onclick="document.getElementById('sizeWarning').style.display='none'; window.print();">
@@ -602,6 +602,11 @@
         // Generate barcodes using JsBarcode
         document.addEventListener('DOMContentLoaded', function() {
             const labelSize = '{{ $labelSize }}';
+            const sideMargin = parseFloat('{{ $sideMargin ?? 0 }}') || 0;
+            const sizeParts = labelSize.split('x');
+            const labelW = parseFloat(sizeParts[0]) || 38;
+            const effectiveW = Math.max(10, labelW - (sideMargin * 2));
+            const widthScale = Math.max(0.55, Math.min(1, effectiveW / labelW));
             
             // Configure barcode settings based on label size
             // Reduced margins for compact printing, but still scannable
@@ -618,6 +623,8 @@
             };
             
             const settings = barcodeSettings[labelSize] || barcodeSettings['45x35'];
+            const scaledWidth  = Math.max(1.2, +(settings.width * widthScale).toFixed(2));
+            const scaledMargin = Math.max(0, +(settings.margin * widthScale).toFixed(2));
             
             @foreach($products as $item)
                 @for($i = 0; $i < $item['quantity']; $i++)
@@ -625,14 +632,14 @@
                         const barcodeValue = '{{ $item['product']->barcode ?? $item['product']->sku ?? sprintf('%08d', $item['product']->id) }}';
                         JsBarcode(".barcode-{{ $item['product']->id }}-{{ $i }}", barcodeValue, {
                             format: "CODE128",
-                            width: settings.width,
+                            width: scaledWidth,
                             height: settings.height,
                             displayValue: false,
-                            margin: settings.margin,
-                            marginTop: settings.margin,
-                            marginBottom: settings.margin,
-                            marginLeft: settings.margin,
-                            marginRight: settings.margin,
+                            margin: scaledMargin,
+                            marginTop: scaledMargin,
+                            marginBottom: scaledMargin,
+                            marginLeft: scaledMargin,
+                            marginRight: scaledMargin,
                             fontSize: settings.fontSize,
                             textAlign: "center",
                             textPosition: "bottom",
