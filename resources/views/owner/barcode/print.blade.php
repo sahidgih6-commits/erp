@@ -67,8 +67,8 @@
             box-sizing: border-box;
             overflow: visible;
             position: relative;
-            width: 45mm;
-            height: 35mm;
+            width: {{ explode('x', $labelSize)[0] ?? 45 }}mm;
+            height: {{ explode('x', $labelSize)[1] ?? 35 }}mm;
             margin-bottom: {{ $stickerGap ?? 0 }}mm;
         }
         
@@ -852,12 +852,12 @@
             const printCss = [
                 '* { margin:0; padding:0; box-sizing:border-box; }',
                 '@page { size:' + labelW + 'mm ' + pageH + 'mm; margin:0; }',
-                'html,body { width:' + labelW + 'mm; height:' + pageH + 'mm; background:white; }',
-                'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; overflow:hidden; }',
+                'html,body { width:' + labelW + 'mm; height:' + pageH + 'mm; margin:0; padding:0; background:white; }',
+                'body { font-family:Arial,sans-serif; display:flex; align-items:flex-start; justify-content:center; overflow:hidden; }',
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
                 '  display:flex; flex-direction:column; justify-content:center; align-items:center;',
-                '  padding:' + (isSmall ? 1 : 0) + 'mm ' + Math.max(sideMargin, isSmall ? 2 : 0) + 'mm;',
-                '  background:white; overflow:hidden; }',
+                '  padding:' + (isSmall ? 0.5 : 0) + 'mm ' + Math.max(sideMargin, isSmall ? 1.5 : 0) + 'mm;',
+                '  background:white; overflow:hidden; box-sizing:border-box; }',
                 '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm) !important;',
                 '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
                 '  width:' + contentW + 'mm; max-width:' + contentW + 'mm; }',
