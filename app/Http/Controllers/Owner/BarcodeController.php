@@ -49,9 +49,9 @@ class BarcodeController extends Controller
             'label_size' => 'required|in:20x10,30x20,40x30,45x35,50x30,60x40,70x50,100x50',
             'include_price' => 'boolean',
             'include_name' => 'boolean',
-            'offset_x' => 'nullable|integer',
-            'offset_y' => 'nullable|integer',
-            'sticker_gap' => 'nullable|integer',
+            'offset_x' => 'nullable|numeric',
+            'offset_y' => 'nullable|numeric',
+            'sticker_gap' => 'nullable|numeric',
         ]);
 
         $business = Auth::user()->business;
