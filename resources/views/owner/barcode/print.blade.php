@@ -94,6 +94,13 @@
             margin: 0;
             padding: 0;
             line-height: 0;
+            width: 100%;
+        }
+        
+        .barcode-svg svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
         }
         
         .barcode-text {
@@ -180,9 +187,17 @@
         }
         .label-38x24 .barcode-svg {
             height: 8mm;
+            width: 100%;
             margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .label-38x24 .barcode-svg svg {
             max-width: 100%;
-            overflow: hidden;
+            height: auto;
+            max-height: 8mm;
+            display: block;
         }
         .label-38x24 .barcode-text {
             font-size: 4pt;
@@ -456,6 +471,13 @@
                 max-width: calc(100% - {{ abs($offsetX ?? 0) }}mm) !important;
                 max-height: calc(100% - {{ abs($offsetY ?? 0) }}mm) !important;
                 overflow: hidden !important;
+            }
+            .barcode-svg {
+                width: 100% !important;
+            }
+            .barcode-svg svg {
+                max-width: 100% !important;
+                height: auto !important;
             }
             .barcode-label:last-child {
                 page-break-after: auto;
@@ -840,8 +862,8 @@
                 '  width:' + contentW + 'mm; max-width:' + contentW + 'mm; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
                 '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
-                '.barcode-svg { height:' + barcodeH + 'mm; width:auto; display:block; margin:0 auto; max-width:' + contentW + 'mm; overflow:hidden; }',
-                '.barcode-svg svg { height:100% !important; width:auto !important; display:block; }',
+                '.barcode-svg { width:' + contentW + 'mm; height:auto; max-height:' + barcodeH + 'mm; display:flex; align-items:center; justify-content:center; margin:0 auto; }',
+                '.barcode-svg svg { max-width:100% !important; height:auto !important; max-height:' + barcodeH + 'mm !important; display:block; }',
                 '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.2mm; text-align:center; }',
                 '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.2mm; text-align:center; }'
             ].join(' ');
