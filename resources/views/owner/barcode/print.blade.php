@@ -759,58 +759,44 @@
             const offsetX   = {{ $offsetX ?? 0 }};
             const offsetY   = {{ $offsetY ?? 0 }};
             const parts  = labelSize.split('x');
-            const labelW = parseFloat(parts[0]) || 45;
-            const labelH = parseFloat(parts[1]) || 35;
-            const pageH  = labelH + Math.max(0, stickerGap);
+            const labelW = parseFloat(parts[0]) || 40;
+            const labelH = parseFloat(parts[1]) || 30;
+            // pageH = label height + extra gap space between stickers
+            const pageH = labelH + Math.max(0, stickerGap);
 
-            // Rongta RP400H thermal printer native DPI
-            const DPI = 203;
-            const MM2PX = DPI / 25.4;
+            // Proportional font sizes (pt) relative to label height
+            const namePt    = Math.max(6,  +(labelH * 0.22).toFixed(1));
+            const codePt    = Math.max(5,  +(labelH * 0.17).toFixed(1));
+            const pricePt   = Math.max(7,  +(labelH * 0.25).toFixed(1));
+            const barcodeH  = +(labelH * 0.50).toFixed(1);
+            const contentW  = +(labelW - 2).toFixed(1);
 
-            // Convert all dimensions to pixels at printer DPI so QZ sends them 1-to-1
-            const labelWpx   = Math.round(labelW  * MM2PX);
-            const labelHpx   = Math.round(labelH  * MM2PX);
-            const pageHpx    = Math.round(pageH   * MM2PX);
-            const offsetXpx  = Math.round(offsetX * MM2PX);
-            const offsetYpx  = Math.round(offsetY * MM2PX);
-
-            // Scale font and barcode heights proportionally from label dimensions
-            const nameFontPx    = Math.max(10, Math.round(labelHpx * 0.13));
-            const barcodeFontPx = Math.max(9,  Math.round(labelHpx * 0.10));
-            const priceFontPx   = Math.max(11, Math.round(labelHpx * 0.14));
-            const barcodeHpx    = Math.round(labelHpx * 0.52);
-
-            // QZ config: scaleContent:false means 1 rendered pixel = 1 printer dot
+            // QZ config — size in mm, scaleContent:true so QZ scales HTML to fit label exactly
             let config = qz.configs.create(printer, {
-                density: DPI,
+                density: 203,
                 size: { width: labelW, height: pageH, units: 'mm' },
                 margins: { top: 0, right: 0, bottom: 0, left: 0, units: 'mm' },
-                scaleContent: false
+                orientation: 'portrait',
+                scaleContent: true
             });
 
-            // Build a fully clean HTML doc — no baseCss with hardcoded 45mm values
-            const printCss =
-                '* { margin:0; padding:0; box-sizing:border-box; }' +
-                '@page { size:' + labelWpx + 'px ' + pageHpx + 'px; margin:0; }' +
-                'html { width:' + labelWpx + 'px; height:' + pageHpx + 'px; overflow:hidden; }' +
-                'body { font-family:Arial,sans-serif; background:white; margin:0; padding:0;' +
-                       'width:' + labelWpx + 'px; height:' + pageHpx + 'px; overflow:hidden; }' +
-                '.barcode-label { width:' + labelWpx + 'px !important; height:' + labelHpx + 'px !important;' +
-                                  'margin:0 !important; padding:0 !important;' +
-                                  'display:flex !important; flex-direction:column !important;' +
-                                  'justify-content:center !important; align-items:center !important;' +
-                                  'background:white; text-align:center; overflow:hidden; }' +
-                '.barcode-content { transform:translate(' + offsetXpx + 'px,' + offsetYpx + 'px);' +
-                                    'display:flex; flex-direction:column;' +
-                                    'align-items:center; justify-content:center; }' +
-                '.product-name { font-size:' + nameFontPx + 'px; font-weight:bold; margin:0;' +
-                                 'white-space:nowrap; overflow:hidden; text-overflow:ellipsis;' +
-                                 'max-width:' + (labelWpx - 4) + 'px; }' +
-                '.barcode-svg  { margin:0; padding:0; line-height:0;' +
-                                 'height:' + barcodeHpx + 'px; width:100%; }' +
-                '.barcode-svg svg { width:100%; height:100%; display:block; }' +
-                '.barcode-text { font-size:' + barcodeFontPx + 'px; margin:0; }' +
-                '.price        { font-size:' + priceFontPx + 'px; font-weight:bold; margin:0; }';
+            // Clean HTML at mm units — QZ will scale this to the exact physical label size
+            const printCss = [
+                '* { margin:0; padding:0; box-sizing:border-box; }',
+                '@page { size:' + labelW + 'mm ' + pageH + 'mm; margin:0; }',
+                'html,body { width:' + labelW + 'mm; height:' + pageH + 'mm; overflow:hidden; background:white; }',
+                'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; }',
+                '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
+                '  display:flex; flex-direction:column; justify-content:center; align-items:center; background:white; }',
+                '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm);',
+                '  display:flex; flex-direction:column; align-items:center; justify-content:center; width:' + contentW + 'mm; }',
+                '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
+                '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
+                '.barcode-svg { width:' + contentW + 'mm; height:' + barcodeH + 'mm; display:block; }',
+                '.barcode-svg svg { width:100%; height:100%; display:block; }',
+                '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.3mm; text-align:center; }',
+                '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.3mm; text-align:center; }'
+            ].join(' ');
 
             let printData = [];
             document.querySelectorAll('.barcode-label').forEach(function(label) {
