@@ -69,6 +69,7 @@
             position: relative;
             width: 45mm;
             height: 35mm;
+            margin-bottom: {{ $stickerGap ?? 0 }}mm;
         }
         
         .barcode-content {
@@ -408,7 +409,7 @@
                 break-after: page;
                 page-break-inside: avoid;
                 break-inside: avoid;
-                margin: 0mm !important;
+                margin: 0mm 0mm {{ $stickerGap ?? 0 }}mm 0mm !important;
                 padding: 0mm !important;
                 display: flex !important;
                 flex-direction: column !important;
@@ -753,26 +754,49 @@
         }
         
         function printLabels(printer) {
+            // Parse label dimensions from labelSize (e.g. '50x30' → 50mm wide, 30mm tall)
+            const labelSize = '{{ $labelSize }}';
+            const stickerGap = {{ $stickerGap ?? 0 }};
+            const offsetX = {{ $offsetX ?? 0 }};
+            const offsetY = {{ $offsetY ?? 0 }};
+            const parts = labelSize.split('x');
+            const labelW = parseFloat(parts[0]) || 45;
+            const labelH = parseFloat(parts[1]) || 35;
+            // Page height includes the gap below each sticker
+            const pageH = labelH + Math.max(0, stickerGap);
+
             let config = qz.configs.create(printer, {
-                size: { width: 45, height: 35, units: 'mm' },
+                size: { width: labelW, height: pageH, units: 'mm' },
                 margins: { top: 0, right: 0, bottom: 0, left: 0, units: 'mm' }
             });
-            
+
+            // Build per-label CSS that applies offset and gap correctly
+            const baseCss = document.querySelector('style').innerHTML;
+            const overrideCss =
+                '.barcode-label{' +
+                    'width:' + labelW + 'mm !important;' +
+                    'height:' + labelH + 'mm !important;' +
+                    'margin:0 !important;padding:0 !important;' +
+                    'display:flex !important;flex-direction:column !important;' +
+                    'justify-content:center !important;align-items:center !important;' +
+                    'page-break-after:always;break-after:page;' +
+                '}' +
+                '.barcode-content{' +
+                    'transform:translate(' + offsetX + 'mm,' + offsetY + 'mm) !important;' +
+                '}';
+
             let printData = [];
-            
-            // Get all barcode labels
-           document.querySelectorAll('.barcode-label').forEach(function(label) {
-                let html = label.outerHTML;
+            document.querySelectorAll('.barcode-label').forEach(function(label) {
                 printData.push({
                     type: 'pixel',
                     format: 'html',
                     flavor: 'plain',
-                    data: '<html><head><style>' +
-                          document.querySelector('style').innerHTML +
-                          '</style></head><body>' + html + '</body></html>'
+                    data: '<html><head><style>' + baseCss + overrideCss + '</style></head>' +
+                          '<body style="margin:0;padding:0;width:' + labelW + 'mm;height:' + pageH + 'mm;overflow:hidden;">' +
+                          label.outerHTML + '</body></html>'
                 });
             });
-            
+
             qz.print(config, printData).then(function() {
                 alert('Labels printed successfully!');
             }).catch(function(err) {
