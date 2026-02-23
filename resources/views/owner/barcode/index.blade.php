@@ -228,7 +228,7 @@
                             <div class="text-xs text-center text-gray-600">
                                 Current Gap: <span id="gapDisplay" class="font-semibold">0mm</span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2">Adjust if printer adds extra space between stickers</p>
+                            <p class="text-xs text-gray-500 mt-2">⬆ More Gap = content shifts UP on label &nbsp;|&nbsp; ⬇ Less Gap = shifts DOWN</p>
                         </div>
                         
                         <!-- Include Options -->

@@ -762,25 +762,29 @@
         
         function printLabels(printer) {
             const labelSize = '{{ $labelSize }}';
-            const stickerGap = {{ $stickerGap ?? 0 }};
+            const stickerGap = {{ $stickerGap ?? 0 }};  // positive = shift UP, negative = shift DOWN
             const offsetX   = {{ $offsetX ?? 0 }};
             const offsetY   = {{ $offsetY ?? 0 }};
             const parts  = labelSize.split('x');
-            const labelW = parseFloat(parts[0]) || 40;
+            const labelW = parseFloat(parts[0]) || 50;
             const labelH = parseFloat(parts[1]) || 30;
-            // pageH = label height + extra gap space between stickers
-            const pageH = labelH + Math.max(0, stickerGap);
+
+            // ALWAYS pageH = labelH — Rongta gap sensor handles physical spacing between labels.
+            // Adding gap to pageH causes double-spacing. Gap here = content Y shift only.
+            const pageH = labelH;
+
+            // stickerGap shifts content UP (positive) or DOWN (negative) within the label
+            const totalOffsetY = +(offsetY - stickerGap).toFixed(1);
 
             // Proportional font sizes (pt) relative to label height
-            const namePt    = Math.max(6,  +(labelH * 0.22).toFixed(1));
-            const codePt    = Math.max(5,  +(labelH * 0.17).toFixed(1));
-            const pricePt   = Math.max(7,  +(labelH * 0.25).toFixed(1));
-            const barcodeH  = +(labelH * 0.50).toFixed(1);
-            // Shrink content width by the absolute horizontal offset so it never overflows the paper edge
-            const contentW  = +Math.max(10, (labelW - 2 - Math.abs(offsetX))).toFixed(1);
-            const contentH  = +Math.max(5,  (labelH - 2 - Math.abs(offsetY))).toFixed(1);
+            const namePt   = Math.max(6,  +(labelH * 0.22).toFixed(1));
+            const codePt   = Math.max(5,  +(labelH * 0.17).toFixed(1));
+            const pricePt  = Math.max(7,  +(labelH * 0.25).toFixed(1));
+            const barcodeH = +(labelH * 0.52).toFixed(1);
+            // Reduce content width only by horizontal offset to avoid edge clipping
+            const contentW = +Math.max(15, (labelW - 2 - Math.abs(offsetX))).toFixed(1);
 
-            // QZ config — size in mm, scaleContent:true so QZ scales HTML to fit label exactly
+            // QZ config — pageH = labelH exactly, printer gap sensor handles label spacing
             let config = qz.configs.create(printer, {
                 density: 203,
                 size: { width: labelW, height: pageH, units: 'mm' },
@@ -789,22 +793,24 @@
                 scaleContent: true
             });
 
-            // Clean HTML at mm units — QZ will scale this to the exact physical label size
+            // KEY FIX: barcode-svg uses height-only sizing, width:auto
+            // This preserves CODE128 bar width ratios so phone scanners can read it.
+            // Forcing a specific mm width on the SVG distorts narrow/wide bar ratios.
             const printCss = [
                 '* { margin:0; padding:0; box-sizing:border-box; }',
                 '@page { size:' + labelW + 'mm ' + pageH + 'mm; margin:0; }',
-                'html,body { width:' + labelW + 'mm; height:' + pageH + 'mm; overflow:hidden; background:white; }',
-                'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; }',
+                'html,body { width:' + labelW + 'mm; height:' + pageH + 'mm; background:white; }',
+                'body { font-family:Arial,sans-serif; display:flex; align-items:center; justify-content:center; overflow:hidden; }',
                 '.barcode-label { width:' + labelW + 'mm; height:' + labelH + 'mm;',
-                '  display:flex; flex-direction:column; justify-content:center; align-items:center; background:white; }',
-                '.barcode-content { transform:translate(' + offsetX + 'mm,' + offsetY + 'mm);',
+                '  display:flex; flex-direction:column; justify-content:center; align-items:center;',
+                '  background:white; overflow:hidden; }',
+                '.barcode-content { transform:translate(' + offsetX + 'mm,' + totalOffsetY + 'mm);',
                 '  display:flex; flex-direction:column; align-items:center; justify-content:center;',
-                '  width:' + contentW + 'mm; max-height:' + contentH + 'mm; overflow:hidden; }',
+                '  max-width:' + contentW + 'mm; }',
                 '.product-name { font-size:' + namePt + 'pt; font-weight:bold; margin-bottom:0.5mm;',
                 '  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:' + contentW + 'mm; text-align:center; }',
-                '.barcode-svg { width:' + contentW + 'mm; height:' + barcodeH + 'mm; display:block; }',
-                '.barcode-svg svg { overflow:hidden; }',
-                '.barcode-svg svg { width:100%; height:100%; display:block; }',
+                '.barcode-svg { height:' + barcodeH + 'mm; width:auto; display:block; margin:0 auto; }',
+                '.barcode-svg svg { height:100% !important; width:auto !important; display:block; }',
                 '.barcode-text { font-size:' + codePt + 'pt; margin-top:0.3mm; text-align:center; }',
                 '.price { font-size:' + pricePt + 'pt; font-weight:bold; margin-top:0.3mm; text-align:center; }'
             ].join(' ');
